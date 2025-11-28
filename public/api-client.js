@@ -1,7 +1,7 @@
 // ==========================================
 // API Configuration
 // ==========================================
-const API_BASE_URL = 'https://api.soporte.growinginmobiliario.com/api'; // Producción
+const API_BASE_URL = 'https://growing-staging-backend.xsxjch.easypanel.host/api';
 // const API_BASE_URL = 'http://localhost:3000/api'; // Desarrollo local
 
 // Token de autenticación (se guardará después del login)
