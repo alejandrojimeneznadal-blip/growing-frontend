@@ -3285,7 +3285,7 @@
         // State management
         let currentUser = null;
         let currentChat = null;
-        let isAdmin = false;
+        let userIsAdmin = false;
         let darkMode = false;
 
         // Mobile menu functions
@@ -3414,8 +3414,8 @@
                         const result = await window.API.login(email, password);
                         if (result.success) {
                             currentUser = result.user;
-                            isAdmin = result.user.role === 'admin';
-                            if (isAdmin) {
+                            userIsAdmin = result.user.role === 'admin';
+                            if (userIsAdmin) {
                                 document.getElementById('adminSection').style.display = 'block';
                             } else {
                                 document.getElementById('adminSection').style.display = 'none';
@@ -3430,10 +3430,10 @@
                     } else {
                         // Demo mode (when API not available)
                         if (email === 'admin@growing.com') {
-                            isAdmin = true;
+                            userIsAdmin = true;
                             document.getElementById('adminSection').style.display = 'block';
                         } else {
-                            isAdmin = false;
+                            userIsAdmin = false;
                             document.getElementById('adminSection').style.display = 'none';
                         }
                         currentUser = { email, name: email.split('@')[0] };
@@ -3599,7 +3599,7 @@
 
         function logout() {
             currentUser = null;
-            isAdmin = false;
+            userIsAdmin = false;
             document.getElementById('adminSection').style.display = 'none'; // Hide admin section
             document.getElementById('authContainer').style.display = 'flex';
             document.getElementById('appContainer').classList.remove('active');
@@ -3608,7 +3608,7 @@
         }
 
         function goToAdmin() {
-            if (isAdmin) {
+            if (userIsAdmin) {
                 document.getElementById('appContainer').classList.remove('active');
                 document.getElementById('adminContainer').classList.add('active');
                 closeSettings();
