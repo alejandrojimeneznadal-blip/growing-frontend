@@ -3248,11 +3248,10 @@
     <!-- API Client Script -->
     <script src="/js/api-client.js"></script>
     
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-        // State management
+    
         let currentUser = null;
         let currentChat = null;
-        let isAdmin = false;
+        let userIsAdmin = false;
         let darkMode = false;
 
         // Mobile menu functions
@@ -3454,7 +3453,7 @@
                         const result = await window.API.login(email, password);
                         if (result.success) {
                             currentUser = result.user;
-                            isAdmin = result.user.role === 'admin';
+                            userIsAdmin = result.user.role === 'admin';
                             if (isAdmin) {
                                 document.getElementById('adminSection').style.display = 'block';
                             } else {
@@ -3470,10 +3469,10 @@
                     } else {
                         // Demo mode (when API not available)
                         if (email === 'admin@growing.com') {
-                            isAdmin = true;
+                            userIsAdmin = true;
                             document.getElementById('adminSection').style.display = 'block';
                         } else {
-                            isAdmin = false;
+                            userIsAdmin = false;
                             document.getElementById('adminSection').style.display = 'none';
                         }
                         currentUser = { email, name: email.split('@')[0] };
@@ -3647,7 +3646,7 @@
 
         function logout() {
             currentUser = null;
-            isAdmin = false;
+            userIsAdmin = false;
             document.getElementById('adminSection').style.display = 'none'; // Hide admin section
             document.getElementById('authContainer').style.display = 'flex';
             document.getElementById('appContainer').classList.remove('active');
