@@ -2436,40 +2436,7 @@
             </button>
             
             <div class="chat-history" id="chatHistory">
-                <div class="chat-history-item active">
-                    <div class="chat-history-title">Consulta Actual</div>
-                    <div class="chat-history-preview">Chat de soporte activo</div>
-                    <div class="chat-history-badge active">ACTIVO</div>
-                    <div class="chat-history-time">Ahora</div>
-                </div>
-                
-                <div class="chat-history-item">
-                    <div class="chat-history-title">Configuración GHL</div>
-                    <div class="chat-history-preview">Cómo configurar workflows automáticos...</div>
-                    <div class="chat-history-badge resolved">RESUELTO</div>
-                    <div class="chat-history-time">Ayer</div>
-                </div>
-                
-                <div class="chat-history-item">
-                    <div class="chat-history-title">Campañas Meta Ads</div>
-                    <div class="chat-history-preview">Optimización de presupuesto para...</div>
-                    <div class="chat-history-badge resolved">RESUELTO</div>
-                    <div class="chat-history-time">Lun</div>
-                </div>
-                
-                <div class="chat-history-item">
-                    <div class="chat-history-title">Estrategia Comercial</div>
-                    <div class="chat-history-preview">Scripts de venta para propiedades premium...</div>
-                    <div class="chat-history-badge resolved">RESUELTO</div>
-                    <div class="chat-history-time">15 Nov</div>
-                </div>
-                
-                <div class="chat-history-item">
-                    <div class="chat-history-title">Automatización CRM</div>
-                    <div class="chat-history-preview">Integración con calendario y email...</div>
-                    <div class="chat-history-badge resolved">RESUELTO</div>
-                    <div class="chat-history-time">10 Nov</div>
-                </div>
+                <!-- Los chats se cargan dinámicamente desde el backend -->
             </div>
             
             <!-- Settings Bar -->
@@ -3207,12 +3174,12 @@
                     <div style="display: flex; flex-direction: column; gap: 1rem;">
                         <div>
                             <label style="display: block; font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Nombre completo</label>
-                            <input type="text" class="form-input" id="settingsName" value="Usuario" style="width: 100%;">
+                            <input type="text" class="form-input" id="settingsName" style="width: 100%;">
                         </div>
                         
                         <div>
                             <label style="display: block; font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Email</label>
-                            <input type="email" class="form-input" id="settingsEmail" value="usuario@growing.com" style="width: 100%;">
+                            <input type="email" class="form-input" id="settingsEmail" style="width: 100%;">
                         </div>
                         
                         <div>
@@ -3279,13 +3246,13 @@
     </div>
 
     <!-- API Client Script -->
-    <script src="/api-client.js"></script>
+    <script src="/js/api-client.js"></script>
     
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // State management
         let currentUser = null;
         let currentChat = null;
-        let userIsAdmin = false;
+        let isAdmin = false;
         let darkMode = false;
 
         // Mobile menu functions
@@ -3397,6 +3364,79 @@
             document.body.classList.add('app-active');
         }
 
+        // Load real chat history from backend
+        async function loadRealChatHistory() {
+            if (!window.API || !window.API.loadChatHistory) {
+                console.log('API not available for loading chat history');
+                return;
+            }
+            
+            try {
+                const result = await window.API.loadChatHistory();
+                if (result.success && result.chats) {
+                    const chatHistory = document.getElementById('chatHistory');
+                    chatHistory.innerHTML = ''; // Clear existing
+                    
+                    if (result.chats.length === 0) {
+                        // No chats yet - show empty state or nothing
+                        return;
+                    }
+                    
+                    result.chats.forEach((chat, index) => {
+                        const chatItem = document.createElement('div');
+                        chatItem.className = 'chat-history-item' + (index === 0 ? ' active' : '');
+                        chatItem.onclick = function() { selectChatFromHistory(chat.id); };
+                        
+                        const statusClass = chat.status === 'active' ? 'active' : 'resolved';
+                        const statusText = chat.status === 'active' ? 'ACTIVO' : 'RESUELTO';
+                        
+                        chatItem.innerHTML = `
+                            <div class="chat-history-title">${chat.title || 'Sin título'}</div>
+                            <div class="chat-history-preview">${chat.preview || ''}</div>
+                            <div class="chat-history-badge ${statusClass}">${statusText}</div>
+                            <div class="chat-history-time">${chat.time || ''}</div>
+                        `;
+                        
+                        chatHistory.appendChild(chatItem);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading chat history:', error);
+            }
+        }
+
+        // Select chat from history
+        function selectChatFromHistory(chatId) {
+            // Close mobile menu if open
+            if (window.innerWidth <= 768) {
+                closeMobileMenu();
+            }
+            
+            // Update active state in sidebar
+            document.querySelectorAll('.chat-history-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.chat-history-item').classList.add('active');
+            
+            // Show messages area
+            document.getElementById('welcomeSection').style.display = 'none';
+            document.getElementById('messagesArea').classList.add('active');
+            
+            // Load messages for this chat (if API available)
+            if (window.API && window.API.loadChatMessages) {
+                window.API.loadChatMessages(chatId).then(result => {
+                    if (result.success && result.messages) {
+                        // Clear and load messages
+                        const messagesArea = document.getElementById('messagesArea');
+                        messagesArea.innerHTML = '';
+                        result.messages.forEach(msg => {
+                            addMessage(msg.text, msg.isUser);
+                        });
+                    }
+                });
+            }
+        }
+
         // Initialize auth forms after DOM is loaded
         function initializeAuth() {
             // Login form handler
@@ -3414,8 +3454,8 @@
                         const result = await window.API.login(email, password);
                         if (result.success) {
                             currentUser = result.user;
-                            userIsAdmin = result.user.role === 'admin';
-                            if (userIsAdmin) {
+                            isAdmin = result.user.role === 'admin';
+                            if (isAdmin) {
                                 document.getElementById('adminSection').style.display = 'block';
                             } else {
                                 document.getElementById('adminSection').style.display = 'none';
@@ -3430,10 +3470,10 @@
                     } else {
                         // Demo mode (when API not available)
                         if (email === 'admin@growing.com') {
-                            userIsAdmin = true;
+                            isAdmin = true;
                             document.getElementById('adminSection').style.display = 'block';
                         } else {
-                            userIsAdmin = false;
+                            isAdmin = false;
                             document.getElementById('adminSection').style.display = 'none';
                         }
                         currentUser = { email, name: email.split('@')[0] };
@@ -3586,6 +3626,14 @@
 
         // Settings Functions
         function openSettings() {
+            // Cargar datos del usuario actual en los campos
+            const user = window.API ? window.API.getCurrentUser() : currentUser;
+            if (user) {
+                document.getElementById('settingsName').value = user.name || '';
+                document.getElementById('settingsEmail').value = user.email || '';
+                document.getElementById('settingsPhone').value = user.phone || '';
+                document.getElementById('settingsCompany').value = user.company || '';
+            }
             document.getElementById('settingsModal').classList.add('active');
         }
 
@@ -3599,7 +3647,7 @@
 
         function logout() {
             currentUser = null;
-            userIsAdmin = false;
+            isAdmin = false;
             document.getElementById('adminSection').style.display = 'none'; // Hide admin section
             document.getElementById('authContainer').style.display = 'flex';
             document.getElementById('appContainer').classList.remove('active');
@@ -3608,7 +3656,7 @@
         }
 
         function goToAdmin() {
-            if (userIsAdmin) {
+            if (isAdmin) {
                 document.getElementById('appContainer').classList.remove('active');
                 document.getElementById('adminContainer').classList.add('active');
                 closeSettings();
