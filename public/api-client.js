@@ -317,6 +317,135 @@ async function getAnalytics() {
 }
 
 // ==========================================
+// Recursos Functions (Admin)
+// ==========================================
+async function loadRecursos(params = {}) {
+    try {
+        const query = new URLSearchParams();
+        if (params.tipo) query.append('tipo', params.tipo);
+        if (params.categoria) query.append('categoria', params.categoria);
+        if (params.page) query.append('page', params.page);
+        if (params.limit) query.append('limit', params.limit);
+
+        const response = await fetch(`${API_BASE_URL}/recursos?${query.toString()}`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+            return { success: true, recursos: data.data.recursos, pagination: data.data.pagination };
+        }
+        return { success: false, error: data.message || 'Error al cargar recursos' };
+    } catch (error) {
+        console.error('Load recursos error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
+async function getRecurso(id) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/recursos/${id}`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+            return { success: true, recurso: data.data };
+        }
+        return { success: false, error: data.message || 'Error al cargar recurso' };
+    } catch (error) {
+        console.error('Get recurso error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
+async function createRecurso(recursoData) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/recursos`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify(recursoData)
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+            return { success: true, recurso: data.data };
+        }
+        return { success: false, error: data.message || 'Error al crear recurso' };
+    } catch (error) {
+        console.error('Create recurso error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
+async function updateRecurso(id, recursoData) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/recursos/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify(recursoData)
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+            return { success: true, recurso: data.data };
+        }
+        return { success: false, error: data.message || 'Error al actualizar recurso' };
+    } catch (error) {
+        console.error('Update recurso error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
+async function deleteRecurso(id) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/recursos/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+            return { success: true };
+        }
+        return { success: false, error: data.message || 'Error al eliminar recurso' };
+    } catch (error) {
+        console.error('Delete recurso error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
+async function uploadPDF(file) {
+    try {
+        const formData = new FormData();
+        formData.append('pdf', file);
+
+        const response = await fetch(`${API_BASE_URL}/recursos/upload-pdf`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}` },
+            body: formData
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+            return { success: true, texto: data.data.texto, filename: data.data.filename };
+        }
+        return { success: false, error: data.message || 'Error al subir PDF' };
+    } catch (error) {
+        console.error('Upload PDF error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
+// ==========================================
 // Settings Functions
 // ==========================================
 async function updateProfile(profileData) {
@@ -427,6 +556,14 @@ window.API = {
     // Admin
     loadUsers,
     getAnalytics,
+    
+    // Recursos
+    loadRecursos,
+    getRecurso,
+    createRecurso,
+    updateRecurso,
+    deleteRecurso,
+    uploadPDF,
     
     // Settings
     updateProfile,
