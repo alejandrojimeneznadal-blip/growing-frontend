@@ -1091,8 +1091,8 @@
             const result = await window.API.uploadPDF(file);
             
             if (result.success) {
-                uploadedPDFText = result.texto;
-                document.getElementById('recursoContenido').value = result.texto;
+                uploadedPDFText = result.text;
+                document.getElementById('recursoContenido').value = result.text;
                 showToast('Texto extraído correctamente', 'success');
             } else {
                 showToast(result.error, 'error');
