@@ -1,10 +1,8 @@
 // ==========================================
 // API Configuration
 // ==========================================
-const API_BASE_URL = 'https://api.soporte.growinginmobiliario.com/api'; // Producción
-// const API_BASE_URL = 'http://localhost:3000/api'; // Desarrollo local
+const API_BASE_URL = 'https://growing-staging-backend.xsxjch.easypanel.host/api';
 
-// Token de autenticación (se guardará después del login)
 let authToken = localStorage.getItem('authToken') || null;
 
 // ==========================================
@@ -12,17 +10,18 @@ let authToken = localStorage.getItem('authToken') || null;
 // ==========================================
 async function loginUser(email, password) {
     try {
+        console.log('Login attempt:', email);
+        
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
 
         const data = await response.json();
+        console.log('Login response:', data);
         
-        if (response.ok) {
+        if (response.ok && data.success) {
             authToken = data.data.token;
             localStorage.setItem('authToken', authToken);
             localStorage.setItem('user', JSON.stringify(data.data.user));
@@ -38,17 +37,18 @@ async function loginUser(email, password) {
 
 async function registerUser(userData) {
     try {
+        console.log('Register attempt:', userData.email);
+        
         const response = await fetch(`${API_BASE_URL}/auth/register`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userData)
         });
 
         const data = await response.json();
+        console.log('Register response:', data);
         
-        if (response.ok) {
+        if (response.ok && data.success) {
             authToken = data.data.token;
             localStorage.setItem('authToken', authToken);
             localStorage.setItem('user', JSON.stringify(data.data.user));
@@ -66,31 +66,44 @@ function logoutUser() {
     authToken = null;
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
-    localStorage.removeItem('currentChat');
+    localStorage.removeItem('currentConversation');
 }
 
 // ==========================================
 // Chat Functions
 // ==========================================
-async function sendMessage(message, category) {
+async function sendMessage(message, conversationId = null, imageBase64 = null, imageMimeType = null) {
     try {
+        const body = { message };
+        if (conversationId) {
+            body.conversationId = conversationId;
+        }
+        if (imageBase64) {
+            body.image = {
+                data: imageBase64,
+                mimeType: imageMimeType || 'image/jpeg'
+            };
+        }
+
         const response = await fetch(`${API_BASE_URL}/chat/message`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authToken}`
             },
-            body: JSON.stringify({
-                message,
-                category,
-                chatId: getCurrentChatId()
-            })
+            body: JSON.stringify(body)
         });
 
         const data = await response.json();
+        console.log('Send message response:', data);
         
-        if (response.ok) {
-            return { success: true, response: data.response, messageId: data.messageId };
+        if (response.ok && data.success) {
+            return { 
+                success: true, 
+                conversation: data.data.conversation,
+                userMessage: data.data.userMessage,
+                botMessage: data.data.botMessage
+            };
         } else {
             return { success: false, error: data.message || 'Error al enviar mensaje' };
         }
@@ -100,71 +113,162 @@ async function sendMessage(message, category) {
     }
 }
 
-async function loadChatHistory() {
+async function loadConversations(limit = 20, offset = 0) {
     try {
-        const response = await fetch(`${API_BASE_URL}/chat/history`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${authToken}`
+        const response = await fetch(
+            `${API_BASE_URL}/chat/conversations?limit=${limit}&offset=${offset}`, 
+            {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${authToken}` }
             }
-        });
+        );
 
         const data = await response.json();
+        console.log('Load conversations response:', data);
         
-        if (response.ok) {
-            return { success: true, chats: data.chats };
+        if (response.ok && data.success) {
+            return { 
+                success: true, 
+                conversations: data.data.conversations,
+                pagination: data.data.pagination
+            };
         } else {
-            return { success: false, error: data.message || 'Error al cargar historial' };
+            return { success: false, error: data.message || 'Error al cargar conversaciones' };
         }
     } catch (error) {
-        console.error('Load history error:', error);
+        console.error('Load conversations error:', error);
         return { success: false, error: 'Error de conexión' };
     }
 }
 
-async function loadChatMessages(chatId) {
+async function loadConversation(conversationId) {
     try {
-        const response = await fetch(`${API_BASE_URL}/chat/${chatId}/messages`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${authToken}`
+        const response = await fetch(
+            `${API_BASE_URL}/chat/conversation/${conversationId}`, 
+            {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${authToken}` }
             }
-        });
+        );
 
         const data = await response.json();
+        console.log('Load conversation response:', data);
         
-        if (response.ok) {
-            return { success: true, messages: data.messages };
+        if (response.ok && data.success) {
+            return { 
+                success: true, 
+                conversation: data.data
+            };
         } else {
-            return { success: false, error: data.message || 'Error al cargar mensajes' };
+            return { success: false, error: data.message || 'Error al cargar conversación' };
         }
     } catch (error) {
-        console.error('Load messages error:', error);
+        console.error('Load conversation error:', error);
         return { success: false, error: 'Error de conexión' };
     }
 }
 
-async function createNewChat(category, title) {
+async function renameConversation(conversationId, newTitle) {
     try {
-        const response = await fetch(`${API_BASE_URL}/chat/create`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            },
-            body: JSON.stringify({ category, title })
-        });
+        const response = await fetch(
+            `${API_BASE_URL}/chat/conversation/${conversationId}`, 
+            {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({ title: newTitle })
+            }
+        );
+
+        const data = await response.json();
+        console.log('Rename conversation response:', data);
+        
+        if (response.ok && data.success) {
+            return { success: true };
+        } else {
+            return { success: false, error: data.message || 'Error al renombrar conversación' };
+        }
+    } catch (error) {
+        console.error('Rename conversation error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
+async function deleteConversation(conversationId) {
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/chat/conversation/${conversationId}`, 
+            {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            }
+        );
+
+        const data = await response.json();
+        console.log('Delete conversation response:', data);
+        
+        if (response.ok && data.success) {
+            return { success: true };
+        } else {
+            return { success: false, error: data.message || 'Error al eliminar conversación' };
+        }
+    } catch (error) {
+        console.error('Delete conversation error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
+async function searchConversations(query) {
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/chat/search?q=${encodeURIComponent(query)}`, 
+            {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            }
+        );
 
         const data = await response.json();
         
-        if (response.ok) {
-            localStorage.setItem('currentChat', data.chatId);
-            return { success: true, chatId: data.chatId };
+        if (response.ok && data.success) {
+            return { success: true, conversations: data.data };
         } else {
-            return { success: false, error: data.message || 'Error al crear chat' };
+            return { success: false, error: data.message || 'Error en búsqueda' };
         }
     } catch (error) {
-        console.error('Create chat error:', error);
+        console.error('Search error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
+async function rateConversation(conversationId, rating, feedback = null) {
+    try {
+        const body = { rating };
+        if (feedback) body.feedback = feedback;
+
+        const response = await fetch(
+            `${API_BASE_URL}/chat/conversation/${conversationId}/rate`, 
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify(body)
+            }
+        );
+
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            return { success: true };
+        } else {
+            return { success: false, error: data.message || 'Error al calificar' };
+        }
+    } catch (error) {
+        console.error('Rate error:', error);
         return { success: false, error: 'Error de conexión' };
     }
 }
@@ -176,15 +280,13 @@ async function loadUsers() {
     try {
         const response = await fetch(`${API_BASE_URL}/admin/users`, {
             method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            }
+            headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
         const data = await response.json();
         
         if (response.ok) {
-            return { success: true, users: data.users };
+            return { success: true, users: data.users || data.data?.users };
         } else {
             return { success: false, error: data.message || 'Error al cargar usuarios' };
         }
@@ -194,51 +296,162 @@ async function loadUsers() {
     }
 }
 
-async function uploadDocument(file, category) {
-    try {
-        const formData = new FormData();
-        formData.append('document', file);
-        formData.append('category', category);
-
-        const response = await fetch(`${API_BASE_URL}/admin/documents/upload`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            },
-            body: formData
-        });
-
-        const data = await response.json();
-        
-        if (response.ok) {
-            return { success: true, documentId: data.documentId };
-        } else {
-            return { success: false, error: data.message || 'Error al subir documento' };
-        }
-    } catch (error) {
-        console.error('Upload document error:', error);
-        return { success: false, error: 'Error de conexión' };
-    }
-}
-
 async function getAnalytics() {
     try {
         const response = await fetch(`${API_BASE_URL}/admin/analytics`, {
             method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${authToken}`
-            }
+            headers: { 'Authorization': `Bearer ${authToken}` }
         });
 
         const data = await response.json();
         
         if (response.ok) {
-            return { success: true, analytics: data };
+            return { success: true, analytics: data.data || data };
         } else {
             return { success: false, error: data.message || 'Error al cargar analíticas' };
         }
     } catch (error) {
         console.error('Load analytics error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
+// ==========================================
+// Recursos Functions (Admin)
+// ==========================================
+async function loadRecursos(params = {}) {
+    try {
+        const query = new URLSearchParams();
+        if (params.tipo) query.append('tipo', params.tipo);
+        if (params.categoria) query.append('categoria', params.categoria);
+        if (params.page) query.append('page', params.page);
+        if (params.limit) query.append('limit', params.limit);
+
+        const response = await fetch(`${API_BASE_URL}/recursos?${query.toString()}`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+            return { success: true, recursos: data.data.recursos, pagination: data.data.pagination };
+        }
+        return { success: false, error: data.message || 'Error al cargar recursos' };
+    } catch (error) {
+        console.error('Load recursos error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
+async function getRecurso(id) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/recursos/${id}`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+            return { success: true, recurso: data.data };
+        }
+        return { success: false, error: data.message || 'Error al cargar recurso' };
+    } catch (error) {
+        console.error('Get recurso error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
+async function createRecurso(recursoData) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/recursos`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify(recursoData)
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+            return { success: true, recurso: data.data };
+        }
+        return { success: false, error: data.message || 'Error al crear recurso' };
+    } catch (error) {
+        console.error('Create recurso error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
+async function updateRecurso(id, recursoData) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/recursos/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify(recursoData)
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+            return { success: true, recurso: data.data };
+        }
+        return { success: false, error: data.message || 'Error al actualizar recurso' };
+    } catch (error) {
+        console.error('Update recurso error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
+async function deleteRecurso(id) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/recursos/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+            return { success: true };
+        }
+        return { success: false, error: data.message || 'Error al eliminar recurso' };
+    } catch (error) {
+        console.error('Delete recurso error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
+async function uploadPDF(file) {
+    try {
+        // Convertir archivo a base64
+        const base64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64String = reader.result.split(',')[1];
+                resolve(base64String);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+
+        const response = await fetch(`${API_BASE_URL}/recursos/upload-pdf`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ pdfBase64: base64 })
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+            return { success: true, text: data.data.text, pages: data.data.pages };
+        }
+        return { success: false, error: data.message || 'Error al subir PDF' };
+    } catch (error) {
+        console.error('Upload PDF error:', error);
         return { success: false, error: 'Error de conexión' };
     }
 }
@@ -259,7 +472,7 @@ async function updateProfile(profileData) {
 
         const data = await response.json();
         
-        if (response.ok) {
+        if (response.ok && data.success) {
             localStorage.setItem('user', JSON.stringify(data.data));
             return { success: true, user: data.data };
         } else {
@@ -284,7 +497,7 @@ async function changePassword(currentPassword, newPassword) {
 
         const data = await response.json();
         
-        if (response.ok) {
+        if (response.ok && data.success) {
             return { success: true };
         } else {
             return { success: false, error: data.message || 'Error al cambiar contraseña' };
@@ -298,17 +511,34 @@ async function changePassword(currentPassword, newPassword) {
 // ==========================================
 // Helper Functions
 // ==========================================
-function getCurrentChatId() {
-    return localStorage.getItem('currentChat') || null;
+function getCurrentConversationId() {
+    return localStorage.getItem('currentConversation') || null;
+}
+
+function setCurrentConversationId(id) {
+    if (id) {
+        localStorage.setItem('currentConversation', id);
+    } else {
+        localStorage.removeItem('currentConversation');
+    }
 }
 
 function getCurrentUser() {
-    const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
+    try {
+        const userStr = localStorage.getItem('user');
+        if (!userStr || userStr === 'undefined' || userStr === 'null') {
+            return null;
+        }
+        return JSON.parse(userStr);
+    } catch (e) {
+        console.error('Error parsing user:', e);
+        localStorage.removeItem('user');
+        return null;
+    }
 }
 
 function isAuthenticated() {
-    return authToken !== null;
+    return authToken !== null && getCurrentUser() !== null;
 }
 
 function isAdmin() {
@@ -317,45 +547,8 @@ function isAdmin() {
 }
 
 // ==========================================
-// WebSocket for Real-time Chat (opcional)
+// Export functions
 // ==========================================
-let socket = null;
-
-function initWebSocket() {
-    if (!authToken) return;
-    
-    // Cambiar URL en producción
-    socket = new WebSocket(`ws://localhost:3000?token=${authToken}`);
-    
-    socket.onopen = () => {
-        console.log('WebSocket connected');
-    };
-    
-    socket.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        handleIncomingMessage(message);
-    };
-    
-    socket.onerror = (error) => {
-        console.error('WebSocket error:', error);
-    };
-    
-    socket.onclose = () => {
-        console.log('WebSocket disconnected');
-        // Intentar reconectar después de 3 segundos
-        setTimeout(initWebSocket, 3000);
-    };
-}
-
-function handleIncomingMessage(message) {
-    // Esta función será llamada cuando llegue un mensaje del servidor
-    // Se debe implementar en el HTML principal para actualizar la UI
-    if (window.onNewMessage) {
-        window.onNewMessage(message);
-    }
-}
-
-// Export functions for use in HTML
 window.API = {
     // Auth
     login: loginUser,
@@ -364,14 +557,24 @@ window.API = {
     
     // Chat
     sendMessage,
-    loadChatHistory,
-    loadChatMessages,
-    createNewChat,
+    loadConversations,
+    loadConversation,
+    renameConversation,
+    deleteConversation,
+    searchConversations,
+    rateConversation,
     
     // Admin
     loadUsers,
-    uploadDocument,
     getAnalytics,
+    
+    // Recursos
+    loadRecursos,
+    getRecurso,
+    createRecurso,
+    updateRecurso,
+    deleteRecurso,
+    uploadPDF,
     
     // Settings
     updateProfile,
@@ -379,7 +582,10 @@ window.API = {
     
     // Helpers
     getCurrentUser,
+    getCurrentConversationId,
+    setCurrentConversationId,
     isAuthenticated,
-    isAdmin,
-    initWebSocket
+    isAdmin
 };
+
+console.log('API client loaded');
