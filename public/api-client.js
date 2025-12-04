@@ -425,18 +425,29 @@ async function deleteRecurso(id) {
 
 async function uploadPDF(file) {
     try {
-        const formData = new FormData();
-        formData.append('pdf', file);
+        // Convertir archivo a base64
+        const base64 = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64String = reader.result.split(',')[1];
+                resolve(base64String);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
 
         const response = await fetch(`${API_BASE_URL}/recursos/upload-pdf`, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${authToken}` },
-            body: formData
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ pdfBase64: base64 })
         });
 
         const data = await response.json();
         if (response.ok && data.success) {
-            return { success: true, texto: data.data.texto, filename: data.data.filename };
+            return { success: true, text: data.data.text, pages: data.data.pages };
         }
         return { success: false, error: data.message || 'Error al subir PDF' };
     } catch (error) {
