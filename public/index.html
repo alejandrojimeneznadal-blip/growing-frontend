@@ -705,24 +705,17 @@
         .escalation-subtitle { font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem; }
         .escalation-loom { margin-bottom: 1rem; border-radius: 8px; overflow: hidden; }
 
-        /* Loom wrapper - tamaño natural del iframe */
-        .loom-wrapper {
+        /* Loom container - no afecta al iframe */
+        .loom-container {
             position: relative;
             display: inline-block;
-            border-radius: 12px;
-            overflow: hidden;
         }
-        .loom-wrapper iframe {
-            display: block;
-            border: none;
-            border-radius: 12px;
-        }
-        /* Loom loader - cubre el video */
+        /* Loom loader - se posiciona sobre el iframe */
         .loom-loader {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             display: flex; align-items: center; justify-content: center; gap: 0.75rem;
             background: var(--bg-secondary);
-            border-radius: 12px;
+            border-radius: 8px;
             z-index: 10;
             transition: opacity 0.3s ease;
         }
@@ -1325,13 +1318,14 @@
 
         function getEscalationContentHTML(category) {
             var resources = escalationResources[category] || escalationResources['comercial'];
+            var loaderId = 'esc-loader-' + Date.now();
             return '<div class="escalation-loom">' +
-                '<div class="loom-wrapper">' +
-                    '<div class="loom-loader">' +
+                '<div class="loom-container">' +
+                    '<div class="loom-loader" id="' + loaderId + '">' +
                         '<div class="loom-loader-spinner"></div>' +
                         '<div class="loom-loader-text">Cargando video...</div>' +
                     '</div>' +
-                    '<iframe src="' + resources.loom + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen onload="this.classList.add(\'loaded\'); this.previousElementSibling.classList.add(\'hidden\');"></iframe>' +
+                    '<iframe src="' + resources.loom + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="width:100%; height:250px; border-radius:8px;" onload="document.getElementById(\'' + loaderId + '\').classList.add(\'hidden\');"></iframe>' +
                 '</div>' +
             '</div>' +
                 '<a href="' + resources.doc + '" target="_blank" class="escalation-doc-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Abrir plantilla de solicitud</a>';
@@ -1370,12 +1364,13 @@
         function containsLoomEmbed(text) { return text && text.includes('loom.com/embed'); }
 
         function wrapIframeWithLoader(iframeHtml) {
-            return '<div class="loom-wrapper">' +
-                '<div class="loom-loader">' +
+            var loaderId = 'loader-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+            return '<div class="loom-container">' +
+                '<div class="loom-loader" id="' + loaderId + '">' +
                     '<div class="loom-loader-spinner"></div>' +
                     '<div class="loom-loader-text">Cargando video...</div>' +
                 '</div>' +
-                iframeHtml.replace('<iframe', '<iframe onload="this.classList.add(\'loaded\'); this.previousElementSibling.classList.add(\'hidden\');"') +
+                iframeHtml.replace('<iframe', '<iframe onload="document.getElementById(\'' + loaderId + '\').classList.add(\'hidden\');"') +
             '</div>';
         }
 
