@@ -617,134 +617,165 @@
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
         @keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.7; } 30% { transform: translateY(-8px); opacity: 1; } }
 
-        /* Feedback Component */
-        .loom-feedback {
-            margin-top: 1rem;
-            padding: 1rem;
-            background-color: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            animation: messageAppear 0.3s ease-out;
-        }
+     /* ==================== NUEVO FEEDBACK SYSTEM - SUTIL E INLINE ==================== */
 
-        .feedback-question {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.5rem 0;
-            opacity: 0;
-            transform: translateY(10px);
-            animation: feedbackAppear 0.3s ease-out forwards;
-        }
+.loom-feedback {
+    margin-top: 0.75rem;
+    opacity: 0;
+    animation: feedbackFadeIn 0.3s ease-out 0.3s forwards;
+}
 
-        @keyframes feedbackAppear {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+@keyframes feedbackFadeIn {
+    to {
+        opacity: 1;
+    }
+}
 
-        .feedback-question-text {
-            font-size: 0.875rem;
-            color: var(--text-primary);
-            font-weight: 500;
-        }
+.feedback-question {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+}
 
-        .feedback-thumbs {
-            display: flex;
-            gap: 0.75rem;
-        }
+.feedback-question.hidden {
+    display: none;
+}
 
-        .feedback-thumb {
-            width: 40px;
-            height: 40px;
-            border: 2px solid var(--border-color);
-            border-radius: 50%;
-            background: var(--bg-primary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            transition: all 0.2s;
-        }
+.feedback-question-text {
+    font-weight: 400;
+}
 
-        .feedback-thumb:hover {
-            border-color: var(--primary-blue);
-            transform: scale(1.1);
-        }
+/* Thumbs container con separador */
+.feedback-thumbs {
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    margin-left: 0.25rem;
+}
 
-        .feedback-thumb.selected {
-            background: var(--primary-blue);
-            border-color: var(--primary-blue);
-        }
+.feedback-thumb {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.15s ease;
+    border-radius: 6px;
+    padding: 0;
+}
 
-        .feedback-thumb.selected.positive {
-            background: var(--success);
-            border-color: var(--success);
-        }
+.feedback-thumb.thumb-down {
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 6px 0 0 6px;
+}
 
-        .feedback-thumb.selected.negative {
-            background: var(--error);
-            border-color: var(--error);
-        }
+.feedback-thumb.thumb-up {
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 0 6px 6px 0;
+}
 
-        .feedback-stars {
-            display: flex;
-            gap: 0.25rem;
-        }
+.feedback-thumb:hover {
+    transform: scale(1.1);
+}
 
-        .feedback-star {
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--border-color);
-            transition: all 0.15s;
-        }
+.feedback-thumb.thumb-down:hover {
+    background: rgba(239, 68, 68, 0.25);
+}
 
-        .feedback-star:hover,
-        .feedback-star.active {
-            color: #FBBF24;
-            transform: scale(1.15);
-        }
+.feedback-thumb.thumb-up:hover {
+    background: rgba(16, 185, 129, 0.25);
+}
 
-        .feedback-star.active {
-            text-shadow: 0 0 8px rgba(251, 191, 36, 0.5);
-        }
+.feedback-separator {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    opacity: 0.5;
+    user-select: none;
+}
 
-        .feedback-yesno {
-            display: flex;
-            gap: 0.5rem;
-        }
+.feedback-thumb.selected {
+    transform: scale(1.15);
+}
 
-        .feedback-yesno-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+.feedback-thumb.selected.thumb-down {
+    background: rgba(239, 68, 68, 0.3);
+}
 
-        .feedback-yesno-btn:hover {
-            border-color: var(--primary-blue);
-            background: var(--light-blue-bg);
-        }
+.feedback-thumb.selected.thumb-up {
+    background: rgba(16, 185, 129, 0.3);
+}
 
-        .feedback-yesno-btn.selected {
-            background: var(--primary-blue);
-            border-color: var(--primary-blue);
-            color: white;
-        }
+/* Stars rating inline */
+.feedback-stars {
+    display: inline-flex;
+    gap: 0.125rem;
+    margin-left: 0.25rem;
+}
 
-        .feedback-thanks {
-            text-align: center;
-            padding: 0.75rem;
-            color: var(--success);
-            font-weight: 500;
-            font-size: 0.875rem;
-        }
+.feedback-star {
+    font-size: 1.125rem;
+    cursor: pointer;
+    color: #D1D5DB;
+    transition: all 0.1s ease;
+    line-height: 1;
+}
+
+.feedback-star:hover,
+.feedback-star.active {
+    color: #FBBF24;
+    transform: scale(1.1);
+}
+
+/* Yes/No buttons inline */
+.feedback-yesno {
+    display: inline-flex;
+    gap: 0.375rem;
+    margin-left: 0.25rem;
+}
+
+.feedback-yesno-btn {
+    padding: 0.25rem 0.625rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.feedback-yesno-btn:hover {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+}
+
+.feedback-yesno-btn.selected {
+    background: var(--primary-blue);
+    border-color: var(--primary-blue);
+    color: white;
+}
+
+/* Thanks message */
+.feedback-thanks {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+    color: var(--success);
+    opacity: 0;
+    animation: feedbackFadeIn 0.3s ease-out forwards;
+}
+
+.feedback-thanks::before {
+    content: '✓';
+    font-weight: 600;
+}
 
         /* Escalation Panel */
         .escalation-panel {
@@ -1402,190 +1433,195 @@
         
         // Create feedback component for Loom messages
         function createFeedbackComponent(messageId) {
-            feedbackCounter++;
-            var feedbackId = 'feedback-' + feedbackCounter;
-            
-            var container = document.createElement('div');
-            container.className = 'loom-feedback';
-            container.id = feedbackId;
-            container.setAttribute('data-message-id', messageId || '');
-            container.setAttribute('data-step', '0');
-            
-            // Initial question
-            var initialQuestion = document.createElement('div');
-            initialQuestion.className = 'feedback-question';
-            initialQuestion.style.animationDelay = '0.5s';
-            initialQuestion.innerHTML = 
-                '<span class="feedback-question-text">¿Se ha resuelto tu consulta?</span>' +
-                '<div class="feedback-thumbs">' +
-                    '<button class="feedback-thumb" onclick="handleFeedbackThumb(\'' + feedbackId + '\', false)" title="No">👎</button>' +
-                    '<button class="feedback-thumb" onclick="handleFeedbackThumb(\'' + feedbackId + '\', true)" title="Sí">👍</button>' +
-                '</div>';
-            
-            container.appendChild(initialQuestion);
-            return container;
-        }
+    feedbackCounter++;
+    var feedbackId = 'feedback-' + feedbackCounter;
+    
+    var container = document.createElement('div');
+    container.className = 'loom-feedback';
+    container.id = feedbackId;
+    container.setAttribute('data-message-id', messageId || '');
+    container.setAttribute('data-step', 'initial');
+    
+    // Initial question - inline y sutil
+    var initialQuestion = document.createElement('div');
+    initialQuestion.className = 'feedback-question';
+    initialQuestion.id = feedbackId + '-q-initial';
+    initialQuestion.innerHTML = 
+        '<span class="feedback-question-text">¿Se ha resuelto tu consulta?</span>' +
+        '<div class="feedback-thumbs">' +
+            '<button class="feedback-thumb thumb-down" onclick="handleFeedbackThumb(\'' + feedbackId + '\', false)" title="No">👎</button>' +
+            '<span class="feedback-separator">/</span>' +
+            '<button class="feedback-thumb thumb-up" onclick="handleFeedbackThumb(\'' + feedbackId + '\', true)" title="Sí">👍</button>' +
+        '</div>';
+    
+    container.appendChild(initialQuestion);
+    return container;
+}
         
         // Handle initial thumb response
         function handleFeedbackThumb(feedbackId, resolved) {
-            var container = document.getElementById(feedbackId);
-            if (!container) return;
-            
-            var thumbs = container.querySelectorAll('.feedback-thumb');
-            thumbs.forEach(function(thumb) {
-                thumb.disabled = true;
-                thumb.style.cursor = 'default';
-            });
-            
-            if (resolved) {
-                // Mark positive thumb as selected
-                thumbs[1].classList.add('selected', 'positive');
-                container.setAttribute('data-resolved', 'true');
-                
-                // Save initial feedback
-                saveFeedback(feedbackId, { resolved: true });
-                
-                // Show next question after delay
-                setTimeout(function() {
-                    showSpeedQuestion(feedbackId);
-                }, 300);
-            } else {
-                // Mark negative thumb as selected
-                thumbs[0].classList.add('selected', 'negative');
-                container.setAttribute('data-resolved', 'false');
-                
-                // Save initial feedback
-                saveFeedback(feedbackId, { resolved: false });
-                
-                // Show escalation panel
-                setTimeout(function() {
-                    showEscalationPanel(feedbackId);
-                }, 300);
-            }
-        }
+    var container = document.getElementById(feedbackId);
+    if (!container) return;
+    
+    var initialQ = document.getElementById(feedbackId + '-q-initial');
+    if (!initialQ) return;
+    
+    // Mark selected and disable
+    var thumbs = initialQ.querySelectorAll('.feedback-thumb');
+    thumbs.forEach(function(thumb) {
+        thumb.disabled = true;
+        thumb.style.cursor = 'default';
+        thumb.style.pointerEvents = 'none';
+    });
+    
+    if (resolved) {
+        thumbs[1].classList.add('selected'); // thumb-up
+        container.setAttribute('data-resolved', 'true');
+        saveFeedback(feedbackId, { resolved: true });
+        
+        // Hide initial question and show speed question
+        setTimeout(function() {
+            initialQ.classList.add('hidden');
+            showSpeedQuestion(feedbackId);
+        }, 200);
+    } else {
+        thumbs[0].classList.add('selected'); // thumb-down
+        container.setAttribute('data-resolved', 'false');
+        saveFeedback(feedbackId, { resolved: false });
+        
+        // Hide initial question and show escalation
+        setTimeout(function() {
+            initialQ.classList.add('hidden');
+            showEscalationPanel(feedbackId);
+        }, 200);
+    }
+}
         
         // Show speed rating question
-        function showSpeedQuestion(feedbackId) {
-            var container = document.getElementById(feedbackId);
-            if (!container) return;
-            
-            var question = document.createElement('div');
-            question.className = 'feedback-question';
-            question.innerHTML = 
-                '<span class="feedback-question-text">Velocidad de respuesta</span>' +
-                '<div class="feedback-stars" data-type="speed">' +
-                    createStarsHTML(feedbackId, 'speed') +
-                '</div>';
-            
-            container.appendChild(question);
-            scrollToBottom();
+function showSpeedQuestion(feedbackId) {
+    var container = document.getElementById(feedbackId);
+    if (!container) return;
+    
+    var question = document.createElement('div');
+    question.className = 'feedback-question';
+    question.id = feedbackId + '-q-speed'; // ID único
+    question.innerHTML = 
+        '<span class="feedback-question-text">Velocidad de respuesta</span>' +
+        '<div class="feedback-stars" data-type="speed">' +
+            createStarsHTML(feedbackId, 'speed') +
+        '</div>';
+    
+    container.appendChild(question);
+    scrollToBottom();
+}
+
+// Show quality rating question
+function showQualityQuestion(feedbackId) {
+    var container = document.getElementById(feedbackId);
+    if (!container) return;
+    
+    var question = document.createElement('div');
+    question.className = 'feedback-question';
+    question.id = feedbackId + '-q-quality'; // ID único
+    question.innerHTML = 
+        '<span class="feedback-question-text">Calidad de la respuesta</span>' +
+        '<div class="feedback-stars" data-type="quality">' +
+            createStarsHTML(feedbackId, 'quality') +
+        '</div>';
+    
+    container.appendChild(question);
+    scrollToBottom();
+}
+
+// Show clear steps question
+function showClearStepsQuestion(feedbackId) {
+    var container = document.getElementById(feedbackId);
+    if (!container) return;
+    
+    var question = document.createElement('div');
+    question.className = 'feedback-question';
+    question.id = feedbackId + '-q-clearsteps'; // ID único
+    question.innerHTML = 
+        '<span class="feedback-question-text">¿Pasos claros para resolver?</span>' +
+        '<div class="feedback-yesno">' +
+            '<button class="feedback-yesno-btn" onclick="handleClearSteps(\'' + feedbackId + '\', true)">Sí</button>' +
+            '<button class="feedback-yesno-btn" onclick="handleClearSteps(\'' + feedbackId + '\', false)">No</button>' +
+        '</div>';
+    
+    container.appendChild(question);
+    scrollToBottom();
+}
+
+// Handle star rating - CORREGIDO para ocultar pregunta anterior
+function handleStarRating(feedbackId, type, rating) {
+    var container = document.getElementById(feedbackId);
+    if (!container) return;
+    
+    var starsContainer = container.querySelector('.feedback-stars[data-type="' + type + '"]');
+    if (!starsContainer) return;
+    
+    // Update visual state
+    var stars = starsContainer.querySelectorAll('.feedback-star');
+    stars.forEach(function(star, index) {
+        if (index < rating) {
+            star.classList.add('active');
+            star.textContent = '★';
+        } else {
+            star.classList.remove('active');
+            star.textContent = '☆';
+        }
+        star.style.pointerEvents = 'none';
+    });
+    
+    // Save this rating
+    var feedbackData = {};
+    feedbackData[type + 'Rating'] = rating;
+    saveFeedback(feedbackId, feedbackData);
+    
+    // Hide current question and show next
+    setTimeout(function() {
+        var currentQuestion = document.getElementById(feedbackId + '-q-' + type);
+        if (currentQuestion) {
+            currentQuestion.classList.add('hidden');
         }
         
-        // Show quality rating question
-        function showQualityQuestion(feedbackId) {
-            var container = document.getElementById(feedbackId);
-            if (!container) return;
-            
-            var question = document.createElement('div');
-            question.className = 'feedback-question';
-            question.innerHTML = 
-                '<span class="feedback-question-text">Calidad de la respuesta</span>' +
-                '<div class="feedback-stars" data-type="quality">' +
-                    createStarsHTML(feedbackId, 'quality') +
-                '</div>';
-            
-            container.appendChild(question);
-            scrollToBottom();
+        if (type === 'speed') {
+            showQualityQuestion(feedbackId);
+        } else if (type === 'quality') {
+            showClearStepsQuestion(feedbackId);
+        }
+    }, 300);
+}
+
+// Handle clear steps response - CORREGIDO para ocultar pregunta
+function handleClearSteps(feedbackId, clearSteps) {
+    var container = document.getElementById(feedbackId);
+    if (!container) return;
+    
+    var buttons = container.querySelectorAll('.feedback-yesno-btn');
+    buttons.forEach(function(btn) {
+        btn.disabled = true;
+        btn.style.cursor = 'default';
+    });
+    buttons[clearSteps ? 0 : 1].classList.add('selected');
+    
+    // Save this response
+    saveFeedback(feedbackId, { clearSteps: clearSteps });
+    
+    // Hide current question and show thanks
+    setTimeout(function() {
+        var currentQuestion = document.getElementById(feedbackId + '-q-clearsteps');
+        if (currentQuestion) {
+            currentQuestion.classList.add('hidden');
         }
         
-        // Show clear steps question
-        function showClearStepsQuestion(feedbackId) {
-            var container = document.getElementById(feedbackId);
-            if (!container) return;
-            
-            var question = document.createElement('div');
-            question.className = 'feedback-question';
-            question.innerHTML = 
-                '<span class="feedback-question-text">¿Pasos claros para resolver?</span>' +
-                '<div class="feedback-yesno">' +
-                    '<button class="feedback-yesno-btn" onclick="handleClearSteps(\'' + feedbackId + '\', true)">Sí</button>' +
-                    '<button class="feedback-yesno-btn" onclick="handleClearSteps(\'' + feedbackId + '\', false)">No</button>' +
-                '</div>';
-            
-            container.appendChild(question);
-            scrollToBottom();
-        }
-        
-        // Create stars HTML
-        function createStarsHTML(feedbackId, type) {
-            var html = '';
-            for (var i = 1; i <= 5; i++) {
-                html += '<span class="feedback-star" data-rating="' + i + '" onclick="handleStarRating(\'' + feedbackId + '\', \'' + type + '\', ' + i + ')">☆</span>';
-            }
-            return html;
-        }
-        
-        // Handle star rating
-        function handleStarRating(feedbackId, type, rating) {
-            var container = document.getElementById(feedbackId);
-            if (!container) return;
-            
-            var starsContainer = container.querySelector('.feedback-stars[data-type="' + type + '"]');
-            if (!starsContainer) return;
-            
-            // Update visual state
-            var stars = starsContainer.querySelectorAll('.feedback-star');
-            stars.forEach(function(star, index) {
-                if (index < rating) {
-                    star.classList.add('active');
-                    star.textContent = '★';
-                } else {
-                    star.classList.remove('active');
-                    star.textContent = '☆';
-                }
-                star.style.pointerEvents = 'none';
-            });
-            
-            // Save this rating
-            var feedbackData = {};
-            feedbackData[type + 'Rating'] = rating;
-            saveFeedback(feedbackId, feedbackData);
-            
-            // Show next question
-            setTimeout(function() {
-                if (type === 'speed') {
-                    showQualityQuestion(feedbackId);
-                } else if (type === 'quality') {
-                    showClearStepsQuestion(feedbackId);
-                }
-            }, 300);
-        }
-        
-        // Handle clear steps response
-        function handleClearSteps(feedbackId, clearSteps) {
-            var container = document.getElementById(feedbackId);
-            if (!container) return;
-            
-            var buttons = container.querySelectorAll('.feedback-yesno-btn');
-            buttons.forEach(function(btn) {
-                btn.disabled = true;
-                btn.style.cursor = 'default';
-            });
-            buttons[clearSteps ? 0 : 1].classList.add('selected');
-            
-            // Save this response
-            saveFeedback(feedbackId, { clearSteps: clearSteps });
-            
-            // Show thanks message
-            setTimeout(function() {
-                var thanks = document.createElement('div');
-                thanks.className = 'feedback-thanks';
-                thanks.textContent = '¡Gracias por tu valoración!';
-                container.appendChild(thanks);
-                scrollToBottom();
-            }, 300);
-        }
-        
+        var thanks = document.createElement('div');
+        thanks.className = 'feedback-thanks';
+        thanks.textContent = '¡Gracias por tu valoración!';
+        container.appendChild(thanks);
+        scrollToBottom();
+    }, 300);
+}       
         // Show escalation panel
         function showEscalationPanel(feedbackId) {
             var container = document.getElementById(feedbackId);
