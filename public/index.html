@@ -705,35 +705,38 @@
         .escalation-subtitle { font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem; }
         .escalation-loom { margin-bottom: 1rem; border-radius: 8px; overflow: hidden; }
 
-        /* Loom loader - flotante minimalista */
+        /* Loom wrapper - fuerza aspect ratio 16:9 horizontal */
         .loom-wrapper {
-            position: relative; display: inline-block;
+            position: relative;
+            width: 100%; max-width: 700px;
+            aspect-ratio: 16 / 9;
             border-radius: 12px;
+            overflow: hidden;
+            background: #000;
         }
         .loom-wrapper iframe {
-            display: block; border: none; border-radius: 12px;
+            position: absolute; top: 0; left: 0;
+            width: 100% !important; height: 100% !important;
+            border: none; border-radius: 12px;
         }
+        /* Loom loader - cubre todo el video */
         .loom-loader {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 1.25rem 1.5rem;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--light-blue-bg) 100%);
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             z-index: 10;
-            transition: opacity 0.3s var(--ease-out-expo), transform 0.3s var(--ease-out-expo);
+            transition: opacity 0.4s var(--ease-out-expo);
         }
         body.dark-mode .loom-loader {
-            background: rgba(30, 41, 59, 0.95);
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         }
         .loom-loader.hidden {
             opacity: 0;
-            transform: translate(-50%, -50%) scale(0.8);
             pointer-events: none;
         }
         .loom-loader-spinner {
-            width: 32px; height: 32px;
+            width: 48px; height: 48px;
             border: 3px solid var(--border-color);
             border-top-color: var(--primary-blue);
             border-radius: 50%;
@@ -741,8 +744,8 @@
         }
         @keyframes loomSpin { to { transform: rotate(360deg); } }
         .loom-loader-text {
-            margin-top: 0.5rem; font-size: 0.75rem;
-            color: var(--text-secondary); white-space: nowrap;
+            margin-top: 0.75rem; font-size: 0.8125rem;
+            color: var(--text-secondary);
         }
         .escalation-doc-link {
             display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem;
