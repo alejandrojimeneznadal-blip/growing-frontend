@@ -704,37 +704,6 @@
         .escalation-title { font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem; }
         .escalation-subtitle { font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem; }
         .escalation-loom { margin-bottom: 1rem; border-radius: 8px; overflow: hidden; }
-
-        /* Loom container - no afecta al iframe */
-        .loom-container {
-            position: relative;
-            display: inline-block;
-        }
-        /* Loom loader - se posiciona sobre el iframe */
-        .loom-loader {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            display: flex; align-items: center; justify-content: center; gap: 0.75rem;
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            z-index: 10;
-            transition: opacity 0.3s ease;
-        }
-        .loom-loader.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .loom-loader-spinner {
-            width: 24px; height: 24px;
-            border: 2px solid var(--border-color);
-            border-top-color: var(--primary-blue);
-            border-radius: 50%;
-            animation: loomSpin 0.7s linear infinite;
-        }
-        @keyframes loomSpin { to { transform: rotate(360deg); } }
-        .loom-loader-text {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
         .escalation-doc-link {
             display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem;
             background: var(--bg-primary); border: 1px solid var(--border-color);
@@ -1318,16 +1287,7 @@
 
         function getEscalationContentHTML(category) {
             var resources = escalationResources[category] || escalationResources['comercial'];
-            var loaderId = 'esc-loader-' + Date.now();
-            return '<div class="escalation-loom">' +
-                '<div class="loom-container">' +
-                    '<div class="loom-loader" id="' + loaderId + '">' +
-                        '<div class="loom-loader-spinner"></div>' +
-                        '<div class="loom-loader-text">Cargando video...</div>' +
-                    '</div>' +
-                    '<iframe src="' + resources.loom + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="width:100%; height:250px; border-radius:8px;" onload="document.getElementById(\'' + loaderId + '\').classList.add(\'hidden\');"></iframe>' +
-                '</div>' +
-            '</div>' +
+            return '<div class="escalation-loom"><iframe src="' + resources.loom + '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="width:100%; height:250px; border-radius:8px;"></iframe></div>' +
                 '<a href="' + resources.doc + '" target="_blank" class="escalation-doc-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Abrir plantilla de solicitud</a>';
         }
 
@@ -1363,16 +1323,6 @@
 
         function containsLoomEmbed(text) { return text && text.includes('loom.com/embed'); }
 
-        function wrapIframeWithLoader(iframeHtml) {
-            var loaderId = 'loader-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
-            return '<div class="loom-container">' +
-                '<div class="loom-loader" id="' + loaderId + '">' +
-                    '<div class="loom-loader-spinner"></div>' +
-                    '<div class="loom-loader-text">Cargando video...</div>' +
-                '</div>' +
-                iframeHtml.replace('<iframe', '<iframe onload="document.getElementById(\'' + loaderId + '\').classList.add(\'hidden\');"') +
-            '</div>';
-        }
 
         // ==================== UI FUNCTIONS ====================
 
@@ -1652,7 +1602,7 @@
                                     iframeMatch.forEach(function(iframe) {
                                         var iframeDiv = document.createElement('div');
                                         iframeDiv.style.marginTop = '1rem';
-                                        iframeDiv.innerHTML = wrapIframeWithLoader(iframe);
+                                        iframeDiv.innerHTML = iframe;
                                         textDiv.appendChild(iframeDiv);
                                     });
                                 }
@@ -1663,8 +1613,7 @@
                                 }, 300);
                             });
                         } else {
-                            // Solo iframe sin texto
-                            textDiv.innerHTML = wrapIframeWithLoader(text);
+                            textDiv.innerHTML = text;
                             setTimeout(function() {
                                 var feedbackComponent = createFeedbackComponent(msgId);
                                 div.appendChild(feedbackComponent);
@@ -1675,19 +1624,13 @@
                         typeWriter(textDiv, text, 25);
                     }
                 } else {
-                    // Sin animación (cargando historial)
+                    textDiv.innerHTML = text;
                     if (hasLoom && !isUser) {
-                        // Envolver iframes con loader
-                        textDiv.innerHTML = text.replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, function(match) {
-                            return wrapIframeWithLoader(match);
-                        });
                         setTimeout(function() {
                             var feedbackComponent = createFeedbackComponent(msgId);
                             div.appendChild(feedbackComponent);
                             scrollToBottom();
                         }, 500);
-                    } else {
-                        textDiv.innerHTML = text;
                     }
                 }
             }
