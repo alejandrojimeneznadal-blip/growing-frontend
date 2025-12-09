@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Base de Conocimientos | Growing Inmobiliario</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #34BCFF;
+            --dark-blue: #166A88;
+            --bright-cyan: #41F2F9;
+            --light-gray: #E8F6FA;
+            --light-blue-bg: rgba(52, 188, 255, 0.08);
+            --text-primary: #1A1A1A;
+            --text-secondary: #6B7280;
+            --border-color: rgba(52, 188, 255, 0.15);
+            --white: #FFFFFF;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F9FEFF;
+            --shadow-sm: 0 2px 4px rgba(22, 106, 136, 0.05);
+            --shadow-md: 0 4px 12px rgba(22, 106, 136, 0.08);
+            --shadow-lg: 0 8px 24px rgba(22, 106, 136, 0.12);
+        }
+
+        body.dark-mode {
+            --text-primary: #F3F4F6;
+            --text-secondary: #9CA3AF;
+            --border-color: rgba(52, 188, 255, 0.2);
+            --white: #111827;
+            --light-gray: #1F2937;
+            --light-blue-bg: rgba(52, 188, 255, 0.1);
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+        }
+
+        .header-title { font-size: 1.5rem; font-weight: 700; }
+        .header-subtitle { font-size: 0.875rem; opacity: 0.9; }
+        .header-actions { display: flex; gap: 1rem; align-items: center; }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--bright-cyan) 100%);
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: var(--light-blue-bg); }
+        .btn-danger { background: var(--error); color: white; }
+        .btn-danger:hover { opacity: 0.9; }
+        .btn-ghost { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-ghost:hover { background: rgba(255,255,255,0.2); }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+        .toolbar { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center; }
+
+        .search-box { flex: 1; min-width: 250px; position: relative; }
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        .search-input:focus { outline: none; border-color: var(--primary-blue); }
+        .search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+
+        /* Custom Select/Dropdown Styles */
+        .custom-select {
+            position: relative;
+            min-width: 150px;
+        }
+
+        .custom-select-trigger {
+            padding: 0.75rem 2.5rem 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .custom-select-trigger:hover {
+            border-color: var(--primary-blue);
+            background: var(--light-blue-bg);
+        }
+
+        .custom-select.open .custom-select-trigger {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(52, 188, 255, 0.1);
+        }
+
+        .custom-select-arrow {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: var(--text-secondary);
+            transition: transform 0.2s;
+            pointer-events: none;
+        }
+
+        .custom-select.open .custom-select-arrow {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .custom-select-options {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+            max-height: 250px;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.2s ease;
+        }
+
+        .custom-select.open .custom-select-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .custom-select-option {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .custom-select-option:hover {
+            background: var(--light-blue-bg);
+        }
+
+        .custom-select-option.selected {
+            background: var(--light-blue-bg);
+            color: var(--primary-blue);
+            font-weight: 500;
+        }
+
+        .custom-select-option.selected::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+        }
+
+        .custom-select-option:first-child {
+            border-radius: 7px 7px 0 0;
+        }
+
+        .custom-select-option:last-child {
+            border-radius: 0 0 7px 7px;
+        }
+
+        /* Form select (dentro de modales) */
+        .form-select-wrapper {
+            position: relative;
+        }
+
+        .form-select-wrapper .custom-select-trigger {
+            background: var(--bg-secondary);
+            width: 100%;
+        }
+
+        /* Ocultar select nativo pero mantenerlo para accesibilidad */
+        .filter-select, .form-select {
+            display: none;
+        }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; }
+        .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--primary-blue); margin-top: 0.25rem; }
+
+        .table-container { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .table th { background: var(--bg-secondary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 600; }
+        .table tr:hover { background: var(--light-blue-bg); }
+        .table tr:last-child td { border-bottom: none; }
+
+        .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }
+        .badge-video { background: #DBEAFE; color: #1E40AF; }
+        .badge-pdf { background: #FEE2E2; color: #991B1B; }
+        .badge-articulo { background: #D1FAE5; color: #065F46; }
+        .badge-comercial { background: #FEF3C7; color: #92400E; }
+        .badge-meta-ads { background: #E0E7FF; color: #3730A3; }
+        .badge-gohighlevel { background: #CFFAFE; color: #0E7490; }
+        .badge-general { background: #F3F4F6; color: #374151; }
+        .badge-pending { background: #FEF3C7; color: #92400E; }
+        .badge-processing { background: #DBEAFE; color: #1E40AF; }
+        .badge-completed { background: #D1FAE5; color: #065F46; }
+        .badge-error { background: #FEE2E2; color: #991B1B; }
+
+        .actions-cell { display: flex; gap: 0.5rem; }
+        .btn-icon {
+            width: 32px; height: 32px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary); color: var(--text-secondary);
+        }
+        .btn-icon:hover { background: var(--light-blue-bg); color: var(--primary-blue); border-color: var(--primary-blue); }
+        .btn-icon.danger:hover { background: #FEE2E2; color: var(--error); border-color: var(--error); }
+
+        .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-secondary); }
+        .empty-state-icon { width: 64px; height: 64px; margin: 0 auto 1rem; opacity: 0.5; }
+
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--bg-primary); border-radius: 16px;
+            width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;
+            border: 1px solid var(--border-color);
+        }
+        .modal-header {
+            padding: 1.5rem; border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-title { font-size: 1.25rem; font-weight: 600; }
+        .modal-close {
+            width: 32px; height: 32px; border-radius: 8px;
+            border: 1px solid var(--border-color); background: var(--bg-secondary);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            color: var(--text-primary);
+        }
+        .modal-close:hover { background: var(--error); color: white; border-color: var(--error); }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); display: flex; gap: 0.75rem; justify-content: flex-end; }
+
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-primary); }
+        .form-input, .form-select, .form-textarea {
+            width: 100%; padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color); border-radius: 8px;
+            font-size: 0.875rem; background: var(--bg-secondary); color: var(--text-primary);
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary-blue); }
+        .form-textarea { min-height: 120px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        .file-upload {
+            border: 2px dashed var(--border-color); border-radius: 8px;
+            padding: 2rem; text-align: center; cursor: pointer; transition: all 0.2s;
+        }
+        .file-upload:hover { border-color: var(--primary-blue); background: var(--light-blue-bg); }
+        .file-upload.dragover { border-color: var(--primary-blue); background: var(--light-blue-bg); }
+        .file-upload.processing { pointer-events: none; opacity: 0.7; }
+        .file-upload-icon { width: 48px; height: 48px; margin: 0 auto 1rem; color: var(--text-secondary); }
+        .file-upload-text { font-size: 0.875rem; color: var(--text-secondary); }
+        .file-upload-text strong { color: var(--primary-blue); }
+
+        .file-info { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: var(--bg-secondary); border-radius: 8px; margin-top: 1rem; }
+        .file-info-name { flex: 1; font-size: 0.875rem; color: var(--text-primary); }
+        .file-info-remove { color: var(--error); cursor: pointer; }
+
+        .loading { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s linear infinite; }
+        .loading-dark { border: 2px solid rgba(0,0,0,0.1); border-top-color: var(--primary-blue); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast { position: fixed; bottom: 2rem; right: 2rem; padding: 1rem 1.5rem; border-radius: 8px; color: white; font-size: 0.875rem; font-weight: 500; z-index: 2000; animation: slideIn 0.3s ease; }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--error); }
+        .toast.info { background: var(--primary-blue); }
+        @keyframes slideIn { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .truncate { max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .pagination { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 1rem; border-top: 1px solid var(--border-color); }
+        .pagination-btn { padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary); cursor: pointer; font-size: 0.875rem; }
+        .pagination-btn:hover:not(:disabled) { background: var(--light-blue-bg); border-color: var(--primary-blue); }
+        .pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination-info { font-size: 0.875rem; color: var(--text-secondary); }
+
+        .progress-bar { width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary-blue), var(--bright-cyan)); transition: width 0.3s ease; }
+        .progress-bar-fill.animated { animation: progressPulse 1.5s ease-in-out infinite; }
+        @keyframes progressPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+        /* Progress Modal Styles */
+        .progress-modal-content { text-align: center; }
+        .progress-icon { width: 64px; height: 64px; margin: 0 auto 1.5rem; color: var(--primary-blue); animation: pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .progress-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .progress-subtitle { color: var(--text-secondary); margin-bottom: 1.5rem; }
+        .progress-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.5rem 0; }
+        .progress-stat { text-align: center; }
+        .progress-stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary-blue); }
+        .progress-stat-label { font-size: 0.75rem; color: var(--text-secondary); }
+        .progress-time { font-size: 0.875rem; color: var(--text-secondary); margin-top: 1rem; }
+        .progress-complete { color: var(--success); }
+        .progress-error { color: var(--error); }
+
+        /* Help Button */
+        .help-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            color: white;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .help-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .help-btn-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        /* Help Modal */
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .help-modal.active { display: flex; }
+        .help-modal-content {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        .help-modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .help-modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .help-modal-body {
+            padding: 1.5rem;
+        }
+        .help-modal-body iframe {
+            width: 100%;
+            height: 450px;
+            border: none;
+            border-radius: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .header { padding: 1rem; flex-direction: column; gap: 1rem; text-align: center; }
+            .toolbar { flex-direction: column; }
+            .search-box { width: 100%; }
+            .form-row { grid-template-columns: 1fr; }
+            .table { font-size: 0.75rem; }
+            .table th, .table td { padding: 0.75rem 0.5rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .progress-stats { grid-template-columns: 1fr; }
+            .help-modal-body iframe { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div>
+                <h1 class="header-title">Base de Conocimientos</h1>
+                <p class="header-subtitle">Gestiona los recursos del asistente de Growing</p>
+            </div>
+            <button class="help-btn" onclick="openHelpModal()">
+                <span>¿Cómo funciona?</span>
+                <span class="help-btn-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4"/>
+                        <path d="M12 8h.01" stroke-width="3"/>
+                    </svg>
+                </span>
+            </button>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-ghost" onclick="window.location.href='/'">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Volver al Chat
+            </button>
+            <button class="btn btn-primary" onclick="openCreateModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Nuevo Recurso
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-label">Total Recursos</div>
+                <div class="stat-value" id="statTotal">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Videos</div>
+                <div class="stat-value" id="statVideos">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">PDFs</div>
+                <div class="stat-value" id="statPDFs">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Artículos</div>
+                <div class="stat-value" id="statArticulos">0</div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="search-box">
+                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                </svg>
+                <input type="text" class="search-input" id="searchInput" placeholder="Buscar recursos..." oninput="handleSearch()">
+            </div>
+            
+            <!-- Custom Dropdown: Tipo -->
+            <div class="custom-select" id="filterTipoDropdown">
+                <div class="custom-select-trigger" onclick="toggleDropdown('filterTipoDropdown')">
+                    <span>Todos los tipos</span>
+                    <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="custom-select-options">
+                    <div class="custom-select-option selected" data-value="" onclick="selectOption('filterTipoDropdown', '', 'Todos los tipos')">Todos los tipos</div>
+                    <div class="custom-select-option" data-value="video" onclick="selectOption('filterTipoDropdown', 'video', 'Videos')">Videos</div>
+                    <div class="custom-select-option" data-value="pdf" onclick="selectOption('filterTipoDropdown', 'pdf', 'PDFs')">PDFs</div>
+                    <div class="custom-select-option" data-value="articulo" onclick="selectOption('filterTipoDropdown', 'articulo', 'Artículos')">Artículos</div>
+                </div>
+                <select class="filter-select" id="filterTipo">
+                    <option value="">Todos los tipos</option>
+                    <option value="video">Videos</option>
+                    <option value="pdf">PDFs</option>
+                    <option value="articulo">Artículos</option>
+                </select>
+            </div>
+
+            <!-- Custom Dropdown: Categoría -->
+            <div class="custom-select" id="filterCategoriaDropdown">
+                <div class="custom-select-trigger" onclick="toggleDropdown('filterCategoriaDropdown')">
+                    <span>Todas las categorías</span>
+                    <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="custom-select-options">
+                    <div class="custom-select-option selected" data-value="" onclick="selectOption('filterCategoriaDropdown', '', 'Todas las categorías')">Todas las categorías</div>
+                    <div class="custom-select-option" data-value="comercial" onclick="selectOption('filterCategoriaDropdown', 'comercial', 'Comercial')">Comercial</div>
+                    <div class="custom-select-option" data-value="meta-ads" onclick="selectOption('filterCategoriaDropdown', 'meta-ads', 'Meta Ads')">Meta Ads</div>
+                    <div class="custom-select-option" data-value="gohighlevel" onclick="selectOption('filterCategoriaDropdown', 'gohighlevel', 'GoHighLevel')">GoHighLevel</div>
+                    <div class="custom-select-option" data-value="general" onclick="selectOption('filterCategoriaDropdown', 'general', 'General')">General</div>
+                </div>
+                <select class="filter-select" id="filterCategoria">
+                    <option value="">Todas las categorías</option>
+                    <option value="comercial">Comercial</option>
+                    <option value="meta-ads">Meta Ads</option>
+                    <option value="gohighlevel">GoHighLevel</option>
+                    <option value="general">General</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Tipo</th>
+                        <th>Categoría</th>
+                        <th>Estado</th>
+                        <th>Actualizado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="recursosTable">
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <div class="loading loading-dark"></div>
+                            <p style="margin-top: 1rem;">Cargando recursos...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div class="modal" id="recursoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Nuevo Recurso</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="recursoForm">
+                    <input type="hidden" id="recursoId">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Tipo *</label>
+                            <div class="form-select-wrapper">
+                                <div class="custom-select" id="recursoTipoDropdown">
+                                    <div class="custom-select-trigger" onclick="toggleDropdown('recursoTipoDropdown')">
+                                        <span>Video (Loom)</span>
+                                        <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M6 9l6 6 6-6"/>
+                                        </svg>
+                                    </div>
+                                    <div class="custom-select-options">
+                                        <div class="custom-select-option selected" data-value="video" onclick="selectOption('recursoTipoDropdown', 'video', 'Video (Loom)', true)">Video (Loom)</div>
+                                        <div class="custom-select-option" data-value="pdf" onclick="selectOption('recursoTipoDropdown', 'pdf', 'PDF', true)">PDF</div>
+                                        <div class="custom-select-option" data-value="articulo" onclick="selectOption('recursoTipoDropdown', 'articulo', 'Artículo', true)">Artículo</div>
+                                    </div>
+                                    <select class="form-select" id="recursoTipo" required>
+                                        <option value="video">Video (Loom)</option>
+                                        <option value="pdf">PDF</option>
+                                        <option value="articulo">Artículo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Categoría *</label>
+                            <div class="form-select-wrapper">
+                                <div class="custom-select" id="recursoCategoriaDropdown">
+                                    <div class="custom-select-trigger" onclick="toggleDropdown('recursoCategoriaDropdown')">
+                                        <span>General</span>
+                                        <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M6 9l6 6 6-6"/>
+                                        </svg>
+                                    </div>
+                                    <div class="custom-select-options">
+                                        <div class="custom-select-option selected" data-value="general" onclick="selectOption('recursoCategoriaDropdown', 'general', 'General')">General</div>
+                                        <div class="custom-select-option" data-value="comercial" onclick="selectOption('recursoCategoriaDropdown', 'comercial', 'Comercial')">Comercial</div>
+                                        <div class="custom-select-option" data-value="meta-ads" onclick="selectOption('recursoCategoriaDropdown', 'meta-ads', 'Meta Ads')">Meta Ads</div>
+                                        <div class="custom-select-option" data-value="gohighlevel" onclick="selectOption('recursoCategoriaDropdown', 'gohighlevel', 'GoHighLevel')">GoHighLevel</div>
+                                    </div>
+                                    <select class="form-select" id="recursoCategoria" required>
+                                        <option value="general">General</option>
+                                        <option value="comercial">Comercial</option>
+                                        <option value="meta-ads">Meta Ads</option>
+                                        <option value="gohighlevel">GoHighLevel</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Título *</label>
+                        <input type="text" class="form-input" id="recursoTitulo" required placeholder="Ej: Cómo crear un pipeline en GoHighLevel">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-textarea" id="recursoDescripcion" placeholder="Breve descripción del contenido..."></textarea>
+                    </div>
+
+                    <div class="form-group" id="urlGroup">
+                        <label class="form-label">URL del Video (Loom)</label>
+                        <input type="url" class="form-input" id="recursoUrl" placeholder="https://www.loom.com/share/...">
+                    </div>
+
+                    <div class="form-group" id="pdfUploadGroup" style="display: none;">
+                        <label class="form-label">Subir PDF</label>
+                        <div class="file-upload" id="fileUpload" onclick="document.getElementById('pdfInput').click()">
+                            <svg class="file-upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <p class="file-upload-text"><strong>Haz clic para subir</strong> o arrastra el archivo aquí</p>
+                            <p class="file-upload-text" style="font-size: 0.75rem; margin-top: 0.5rem;">PDF (máx. 50MB)</p>
+                        </div>
+                        <input type="file" id="pdfInput" accept=".pdf" style="display: none;" onchange="handlePDFSelect(event)">
+                        <div class="file-info" id="fileInfo" style="display: none;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <span class="file-info-name" id="fileName"></span>
+                            <svg class="file-info-remove" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="removePDF()">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                            </svg>
+                        </div>
+                        <div id="pdfProgress" style="display: none;">
+                            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                <span id="pdfProgressText">Extrayendo texto...</span>
+                            </p>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" id="pdfProgressBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Contenido / Texto</label>
+                        <textarea class="form-textarea" id="recursoContenido" placeholder="Contenido del artículo o transcripción del video..." style="min-height: 150px;"></textarea>
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                            Este texto se usará para generar el embedding y permitir búsquedas semánticas.
+                        </p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-primary" id="saveBtn" onclick="saveRecurso()">
+                    <span id="saveBtnText">Guardar</span>
+                    <span id="saveBtnLoading" class="loading" style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Eliminar Recurso</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-secondary);">¿Estás seguro de que deseas eliminar este recurso? Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn" onclick="confirmDelete()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Progress Modal -->
+    <div class="modal" id="progressModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+                <span></span>
+                <button class="modal-close" onclick="closeProgressModal()" title="Cerrar (el proceso continuará)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body progress-modal-content" style="padding-top: 0;">
+                <svg class="progress-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <h3 class="progress-title" id="progressTitle">Generando embeddings...</h3>
+                <p class="progress-subtitle" id="progressSubtitle">Esto puede tardar unos minutos para documentos grandes</p>
+                
+                <div class="progress-bar" style="margin: 1.5rem 0;">
+                    <div class="progress-bar-fill animated" id="embeddingProgressBar" style="width: 0%"></div>
+                </div>
+                
+                <div class="progress-stats">
+                    <div class="progress-stat">
+                        <div class="progress-stat-value" id="progressCompleted">0</div>
+                        <div class="progress-stat-label">Completados</div>
+                    </div>
+                    <div class="progress-stat">
+                        <div class="progress-stat-value" id="progressTotal">0</div>
+                        <div class="progress-stat-label">Total chunks</div>
+                    </div>
+                    <div class="progress-stat">
+                        <div class="progress-stat-value" id="progressPercent">0%</div>
+                        <div class="progress-stat-label">Progreso</div>
+                    </div>
+                </div>
+                
+                <p class="progress-time" id="progressTime">Tiempo estimado: calculando...</p>
+            </div>
+            <div class="modal-footer" style="justify-content: center; border-top: none;">
+                <button class="btn btn-primary" id="progressCloseBtn" onclick="closeProgressModal()" style="display: none;">Cerrar</button>
+                <p id="progressNote" style="font-size: 0.75rem; color: var(--text-secondary); text-align: center;">
+                    Puedes cerrar esta ventana. El proceso continuará en segundo plano.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="help-modal" id="helpModal">
+        <div class="help-modal-content">
+            <div class="help-modal-header">
+                <h3 class="help-modal-title">¿Cómo funciona la Base de Conocimientos?</h3>
+                <button class="modal-close" onclick="closeHelpModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="help-modal-body">
+                <iframe src="https://www.loom.com/embed/1bd16cd2d6744b6e8cea6a20d041de11" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/api-client.js"></script>
+    <script>
+        // Initialize PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // API URL - usa la de api-client.js si existe, sino fallback
+        const _API_URL = (typeof API_BASE_URL !== 'undefined') 
+            ? API_BASE_URL 
+            : 'https://api.soporte.growinginmobiliario.com/api';
+
+        // State
+        let recursos = [];
+        let filteredRecursos = [];
+        let currentPage = 1;
+        let totalPages = 1;
+        let editingId = null;
+        let deleteId = null;
+        let uploadedPDFText = null;
+        let isProcessingPDF = false;
+        let progressPollingInterval = null;
+        let currentProcessingId = null;
+
+        // Check auth on load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!window.API || !window.API.isAuthenticated()) {
+                window.location.href = '/';
+                return;
+            }
+            
+            if (!window.API.isAdmin()) {
+                alert('Acceso denegado. Solo administradores.');
+                window.location.href = '/';
+                return;
+            }
+
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+
+            loadRecursos();
+            setupDragDrop();
+            
+            // Cerrar dropdowns al hacer clic fuera
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.custom-select')) {
+                    document.querySelectorAll('.custom-select.open').forEach(el => {
+                        el.classList.remove('open');
+                    });
+                }
+            });
+        });
+
+        // Help Modal Functions
+        function openHelpModal() {
+            document.getElementById('helpModal').classList.add('active');
+        }
+
+        function closeHelpModal() {
+            document.getElementById('helpModal').classList.remove('active');
+        }
+
+        // Custom Dropdown Functions
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            const wasOpen = dropdown.classList.contains('open');
+            
+            // Cerrar todos los dropdowns
+            document.querySelectorAll('.custom-select.open').forEach(el => {
+                el.classList.remove('open');
+            });
+            
+            // Abrir este si estaba cerrado
+            if (!wasOpen) {
+                dropdown.classList.add('open');
+            }
+        }
+
+        function selectOption(dropdownId, value, label, triggerTipoChange = false) {
+            const dropdown = document.getElementById(dropdownId);
+            const trigger = dropdown.querySelector('.custom-select-trigger span');
+            const hiddenSelect = dropdown.querySelector('select');
+            const options = dropdown.querySelectorAll('.custom-select-option');
+            
+            // Actualizar texto del trigger
+            trigger.textContent = label;
+            
+            // Actualizar select oculto
+            if (hiddenSelect) {
+                hiddenSelect.value = value;
+            }
+            
+            // Marcar opción seleccionada
+            options.forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.value === value) {
+                    opt.classList.add('selected');
+                }
+            });
+            
+            // Cerrar dropdown
+            dropdown.classList.remove('open');
+            
+            // Trigger eventos según el dropdown
+            if (dropdownId === 'filterTipoDropdown' || dropdownId === 'filterCategoriaDropdown') {
+                currentPage = 1;
+                loadRecursos(); // Recargar del servidor con nuevos filtros
+            }
+            
+            if (triggerTipoChange && dropdownId === 'recursoTipoDropdown') {
+                handleTipoChange();
+            }
+        }
+
+        function setDropdownValue(dropdownId, value) {
+            const dropdown = document.getElementById(dropdownId);
+            if (!dropdown) return;
+            
+            const options = dropdown.querySelectorAll('.custom-select-option');
+            const trigger = dropdown.querySelector('.custom-select-trigger span');
+            const hiddenSelect = dropdown.querySelector('select');
+            
+            options.forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.value === value) {
+                    opt.classList.add('selected');
+                    trigger.textContent = opt.textContent;
+                }
+            });
+            
+            if (hiddenSelect) {
+                hiddenSelect.value = value;
+            }
+        }
+
+        async function loadRecursos() {
+            const tipo = document.getElementById('filterTipo').value;
+            const categoria = document.getElementById('filterCategoria').value;
+            
+            const result = await window.API.loadRecursos({
+                tipo,
+                categoria,
+                page: currentPage,
+                limit: 100 // Cargar más para filtrado local
+            });
+
+            if (result.success) {
+                recursos = result.recursos || [];
+                applySearchFilter();
+                
+                if (result.pagination) {
+                    totalPages = result.pagination.totalPages || 1;
+                }
+                
+                updateStats();
+                renderTable();
+                renderPagination();
+            } else {
+                showToast(result.error, 'error');
+            }
+        }
+
+        function applySearchFilter() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                filteredRecursos = recursos;
+                return;
+            }
+            
+            filteredRecursos = recursos.filter(r => {
+                const titulo = (r.titulo || '').toLowerCase();
+                const descripcion = (r.descripcion || '').toLowerCase();
+                const categoria = (r.categoria || '').toLowerCase();
+                
+                return titulo.includes(searchTerm) || 
+                       descripcion.includes(searchTerm) || 
+                       categoria.includes(searchTerm);
+            });
+        }
+
+        function filterRecursos() {
+            applySearchFilter();
+            updateStats();
+            renderTable();
+        }
+
+        // Debounce para el buscador (evitar muchas llamadas)
+        let searchTimeout;
+        function handleSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                filterRecursos();
+            }, 300);
+        }
+
+        function updateStats() {
+            const total = recursos.length;
+            const videos = recursos.filter(r => r.tipo === 'video').length;
+            const pdfs = recursos.filter(r => r.tipo === 'pdf').length;
+            const articulos = recursos.filter(r => r.tipo === 'articulo').length;
+
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statVideos').textContent = videos;
+            document.getElementById('statPDFs').textContent = pdfs;
+            document.getElementById('statArticulos').textContent = articulos;
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('recursosTable');
+            
+            if (filteredRecursos.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <p>No hay recursos disponibles</p>
+                            <button class="btn btn-primary" style="margin-top: 1rem;" onclick="openCreateModal()">Crear primer recurso</button>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filteredRecursos.map(r => `
+                <tr>
+                    <td><div class="truncate" title="${escapeHtml(r.titulo)}">${escapeHtml(r.titulo)}</div></td>
+                    <td><span class="badge badge-${r.tipo}">${r.tipo}</span></td>
+                    <td><span class="badge badge-${r.categoria}">${r.categoria}</span></td>
+                    <td>
+                        <span class="badge badge-${r.embeddingStatus}" ${r.embeddingStatus === 'processing' ? 'style="cursor:pointer" onclick="showProgressForResource(\'' + r.id + '\')"' : ''}>
+                            ${r.embeddingStatus}${r.embeddingStatus === 'processing' ? ' ...' : ''}
+                        </span>
+                    </td>
+                    <td>${formatDate(r.updatedAt)}</td>
+                    <td>
+                        <div class="actions-cell">
+                            <button class="btn-icon" title="Editar" onclick="editRecurso('${r.id}')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                            </button>
+                            <button class="btn-icon danger" title="Eliminar" onclick="openDeleteModal('${r.id}')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPagination() {
+            const container = document.getElementById('pagination');
+            if (totalPages <= 1) { container.innerHTML = ''; return; }
+            container.innerHTML = `
+                <button class="pagination-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Anterior</button>
+                <span class="pagination-info">Página ${currentPage} de ${totalPages}</span>
+                <button class="pagination-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Siguiente</button>
+            `;
+        }
+
+        function goToPage(page) {
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            loadRecursos();
+        }
+
+        // Modal functions
+        function openCreateModal() {
+            editingId = null;
+            uploadedPDFText = null;
+            document.getElementById('modalTitle').textContent = 'Nuevo Recurso';
+            document.getElementById('recursoForm').reset();
+            document.getElementById('recursoId').value = '';
+            document.getElementById('fileInfo').style.display = 'none';
+            document.getElementById('pdfProgress').style.display = 'none';
+            
+            // Reset custom dropdowns
+            setDropdownValue('recursoTipoDropdown', 'video');
+            setDropdownValue('recursoCategoriaDropdown', 'general');
+            
+            handleTipoChange();
+            document.getElementById('recursoModal').classList.add('active');
+        }
+
+        async function editRecurso(id) {
+            editingId = id;
+            uploadedPDFText = null;
+            document.getElementById('modalTitle').textContent = 'Editar Recurso';
+            
+            const result = await window.API.getRecurso(id);
+            
+            if (result.success) {
+                const r = result.recurso;
+                document.getElementById('recursoId').value = r.id;
+                document.getElementById('recursoTipo').value = r.tipo;
+                document.getElementById('recursoCategoria').value = r.categoria;
+                document.getElementById('recursoTitulo').value = r.titulo;
+                document.getElementById('recursoDescripcion').value = r.descripcion || '';
+                document.getElementById('recursoUrl').value = r.url || '';
+                document.getElementById('recursoContenido').value = r.contenido || '';
+                document.getElementById('fileInfo').style.display = 'none';
+                document.getElementById('pdfProgress').style.display = 'none';
+                
+                // Update custom dropdowns
+                setDropdownValue('recursoTipoDropdown', r.tipo);
+                setDropdownValue('recursoCategoriaDropdown', r.categoria);
+                
+                handleTipoChange();
+                document.getElementById('recursoModal').classList.add('active');
+            } else {
+                showToast(result.error, 'error');
+            }
+        }
+
+        function closeModal() {
+            if (isProcessingPDF && !confirm('Se está procesando un PDF. ¿Seguro que quieres cancelar?')) return;
+            document.getElementById('recursoModal').classList.remove('active');
+            editingId = null;
+            uploadedPDFText = null;
+            isProcessingPDF = false;
+        }
+
+        function handleTipoChange() {
+            const tipo = document.getElementById('recursoTipo').value;
+            document.getElementById('urlGroup').style.display = tipo === 'video' ? 'block' : 'none';
+            document.getElementById('pdfUploadGroup').style.display = tipo === 'pdf' ? 'block' : 'none';
+        }
+
+        async function saveRecurso() {
+            if (isProcessingPDF) {
+                showToast('Espera a que termine de procesar el PDF', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('saveBtn');
+            const btnText = document.getElementById('saveBtnText');
+            const btnLoading = document.getElementById('saveBtnLoading');
+            
+            const data = {
+                tipo: document.getElementById('recursoTipo').value,
+                categoria: document.getElementById('recursoCategoria').value,
+                titulo: document.getElementById('recursoTitulo').value.trim(),
+                descripcion: document.getElementById('recursoDescripcion').value.trim(),
+                url: document.getElementById('recursoUrl').value.trim() || null,
+                contenido: uploadedPDFText || document.getElementById('recursoContenido').value.trim()
+            };
+
+            if (!data.titulo) {
+                showToast('El título es obligatorio', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline-block';
+
+            let result;
+            if (editingId) {
+                result = await window.API.updateRecurso(editingId, data);
+            } else {
+                result = await window.API.createRecurso(data);
+            }
+
+            btn.disabled = false;
+            btnText.style.display = 'inline';
+            btnLoading.style.display = 'none';
+
+            if (result.success) {
+                showToast(editingId ? 'Recurso actualizado' : 'Recurso creado', 'success');
+                closeModal();
+                loadRecursos();
+                
+                // Si hay contenido y se van a generar embeddings, mostrar progreso
+                const resourceData = result.data || result.recurso;
+                if (resourceData && (resourceData.estimatedChunks > 0 || data.contenido)) {
+                    const resourceId = resourceData.id;
+                    const estimatedChunks = resourceData.estimatedChunks || 0;
+                    console.log('Opening progress for:', resourceId, 'estimated:', estimatedChunks);
+                    setTimeout(() => showProgressForResource(resourceId, estimatedChunks), 500);
+                }
+            } else {
+                showToast(result.error, 'error');
+            }
+        }
+
+        // Progress Modal Functions
+        let expectedTotalChunks = 0; // Guardamos el total esperado
+
+        function showProgressForResource(resourceId, estimatedChunks = 0) {
+            currentProcessingId = resourceId;
+            expectedTotalChunks = estimatedChunks;
+            
+            // Reset UI
+            document.getElementById('progressModal').classList.add('active');
+            document.getElementById('progressCloseBtn').style.display = 'none';
+            document.getElementById('progressNote').style.display = 'block';
+            document.getElementById('progressTitle').textContent = 'Generando embeddings...';
+            document.getElementById('progressTitle').className = 'progress-title';
+            document.getElementById('embeddingProgressBar').classList.add('animated');
+            document.getElementById('embeddingProgressBar').style.width = '0%';
+            document.getElementById('progressCompleted').textContent = '0';
+            document.getElementById('progressTotal').textContent = estimatedChunks || '...';
+            document.getElementById('progressPercent').textContent = '0%';
+            document.getElementById('progressTime').textContent = 'Calculando...';
+            
+            startProgressPolling(resourceId);
+        }
+
+        function startProgressPolling(resourceId) {
+            if (progressPollingInterval) {
+                clearInterval(progressPollingInterval);
+            }
+
+            const poll = async () => {
+                try {
+                    const token = localStorage.getItem('authToken');
+                    const response = await fetch(`${_API_URL}/recursos/${resourceId}/status`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const result = await response.json();
+
+                    console.log('Status poll:', result.data); // Debug
+
+                    if (result.success) {
+                        // Usar el total esperado si lo tenemos, sino el de la BD
+                        const total = expectedTotalChunks || result.data.chunks.total || 1;
+                        const completed = result.data.chunks.completed || 0;
+                        const errors = result.data.chunks.error || 0;
+                        const processed = completed + errors;
+                        const progress = Math.round((processed / total) * 100);
+                        
+                        updateProgressUI({
+                            chunks: { 
+                                completed, 
+                                total,
+                                error: errors
+                            },
+                            progress,
+                            estimatedSecondsRemaining: (total - processed) * 2.5 // ~2.5s por chunk
+                        });
+                        
+                        // Si está completo o hay error, detener polling
+                        const status = result.data.recurso.status;
+                        if (status === 'completed' || status === 'error') {
+                            clearInterval(progressPollingInterval);
+                            progressPollingInterval = null;
+                            
+                            document.getElementById('embeddingProgressBar').classList.remove('animated');
+                            document.getElementById('progressCloseBtn').style.display = 'inline-flex';
+                            document.getElementById('progressNote').style.display = 'none';
+                            
+                            if (status === 'completed') {
+                                document.getElementById('progressTitle').textContent = 'Procesamiento completado';
+                                document.getElementById('progressTitle').classList.add('progress-complete');
+                                document.getElementById('embeddingProgressBar').style.width = '100%';
+                                document.getElementById('progressPercent').textContent = '100%';
+                            } else {
+                                document.getElementById('progressTitle').textContent = 'Procesamiento con errores';
+                                document.getElementById('progressTitle').classList.add('progress-error');
+                            }
+                            
+                            loadRecursos();
+                        }
+                    } else {
+                        console.error('Status error:', result);
+                    }
+                } catch (error) {
+                    console.error('Error polling status:', error);
+                }
+            };
+
+            poll();
+            progressPollingInterval = setInterval(poll, 2000);
+        }
+
+        function updateProgressUI(data) {
+            const { chunks, progress, estimatedSecondsRemaining } = data;
+            
+            document.getElementById('progressCompleted').textContent = chunks.completed;
+            document.getElementById('progressTotal').textContent = chunks.total;
+            document.getElementById('progressPercent').textContent = progress + '%';
+            document.getElementById('embeddingProgressBar').style.width = progress + '%';
+            
+            if (estimatedSecondsRemaining > 0) {
+                const minutes = Math.floor(estimatedSecondsRemaining / 60);
+                const seconds = Math.round(estimatedSecondsRemaining % 60);
+                document.getElementById('progressTime').textContent = 
+                    minutes > 0 
+                        ? `Tiempo restante: ~${minutes}m ${seconds}s`
+                        : `Tiempo restante: ~${seconds}s`;
+            } else {
+                document.getElementById('progressTime').textContent = 'Finalizando...';
+            }
+        }
+
+        function closeProgressModal() {
+            document.getElementById('progressModal').classList.remove('active');
+            if (progressPollingInterval) {
+                clearInterval(progressPollingInterval);
+                progressPollingInterval = null;
+            }
+            currentProcessingId = null;
+        }
+
+        // Delete functions
+        function openDeleteModal(id) {
+            deleteId = id;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            deleteId = null;
+        }
+
+        async function confirmDelete() {
+            if (!deleteId) return;
+            
+            const result = await window.API.deleteRecurso(deleteId);
+            
+            if (result.success) {
+                showToast('Recurso eliminado', 'success');
+                closeDeleteModal();
+                loadRecursos();
+            } else {
+                showToast(result.error, 'error');
+            }
+        }
+
+        // PDF upload - CLIENT SIDE EXTRACTION
+        function setupDragDrop() {
+            const dropZone = document.getElementById('fileUpload');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
+                dropZone.addEventListener(event, e => { e.preventDefault(); e.stopPropagation(); });
+            });
+
+            ['dragenter', 'dragover'].forEach(event => {
+                dropZone.addEventListener(event, () => dropZone.classList.add('dragover'));
+            });
+
+            ['dragleave', 'drop'].forEach(event => {
+                dropZone.addEventListener(event, () => dropZone.classList.remove('dragover'));
+            });
+
+            dropZone.addEventListener('drop', e => {
+                const file = e.dataTransfer.files[0];
+                if (file && file.type === 'application/pdf') {
+                    handlePDFFile(file);
+                } else {
+                    showToast('Por favor selecciona un archivo PDF', 'error');
+                }
+            });
+        }
+
+        function handlePDFSelect(event) {
+            const file = event.target.files[0];
+            if (file) handlePDFFile(file);
+        }
+
+        async function handlePDFFile(file) {
+            if (file.size > 50 * 1024 * 1024) {
+                showToast('El archivo es demasiado grande (máx. 50MB)', 'error');
+                return;
+            }
+
+            if (isProcessingPDF) {
+                showToast('Ya se está procesando un PDF', 'error');
+                return;
+            }
+
+            isProcessingPDF = true;
+            
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileInfo').style.display = 'flex';
+            document.getElementById('pdfProgress').style.display = 'block';
+            document.getElementById('pdfProgressText').textContent = 'Cargando PDF...';
+            document.getElementById('pdfProgressBar').style.width = '10%';
+            document.getElementById('fileUpload').classList.add('processing');
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                document.getElementById('pdfProgressBar').style.width = '20%';
+                document.getElementById('pdfProgressText').textContent = 'Analizando documento...';
+                
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                const numPages = pdf.numPages;
+                
+                document.getElementById('pdfProgressText').textContent = `Extrayendo texto (0/${numPages} páginas)...`;
+                
+                let fullText = '';
+                
+                for (let i = 1; i <= numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    fullText += pageText + '\n\n';
+                    
+                    const progress = 20 + Math.round((i / numPages) * 70);
+                    document.getElementById('pdfProgressBar').style.width = progress + '%';
+                    document.getElementById('pdfProgressText').textContent = `Extrayendo texto (${i}/${numPages} páginas)...`;
+                }
+                
+                fullText = fullText.replace(/\s+/g, ' ').replace(/\n\s*\n/g, '\n\n').trim();
+                
+                document.getElementById('pdfProgressBar').style.width = '100%';
+                document.getElementById('pdfProgressText').textContent = 'Completado';
+                
+                uploadedPDFText = fullText;
+                document.getElementById('recursoContenido').value = fullText;
+                
+                if (!document.getElementById('recursoTitulo').value) {
+                    document.getElementById('recursoTitulo').value = file.name.replace('.pdf', '').replace(/_/g, ' ');
+                }
+                
+                showToast(`Texto extraído: ${numPages} páginas, ${fullText.length.toLocaleString()} caracteres`, 'success');
+                
+            } catch (error) {
+                console.error('PDF parse error:', error);
+                showToast('Error al extraer texto del PDF: ' + error.message, 'error');
+                removePDF();
+            } finally {
+                isProcessingPDF = false;
+                document.getElementById('fileUpload').classList.remove('processing');
+            }
+        }
+
+        function removePDF() {
+            document.getElementById('pdfInput').value = '';
+            document.getElementById('fileInfo').style.display = 'none';
+            document.getElementById('pdfProgress').style.display = 'none';
+            document.getElementById('fileUpload').classList.remove('processing');
+            uploadedPDFText = null;
+            isProcessingPDF = false;
+        }
+
+        // Helpers
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            return new Date(dateStr).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function showToast(message, type = 'success') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.remove(), 4000);
+        }
+    </script>
+</body>
+</html>
