@@ -1335,7 +1335,7 @@
             function addWord() {
                 if (currentIndex < words.length) {
                     currentText += (currentIndex > 0 ? ' ' : '') + words[currentIndex];
-                    element.textContent = currentText;
+                    element.innerHTML = currentText;
                     currentIndex++;
                     
                     // Scroll mientras se escribe
@@ -1401,7 +1401,7 @@
                     typeWriter(textDiv, text, 25);
                 } else {
                     // Sin animación - mostrar todo de golpe
-                    textDiv.textContent = text;
+                    textDiv.innerHTML = text;
                 }
             }
         }
