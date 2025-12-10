@@ -1892,7 +1892,9 @@
         function startNewChat() {
             if (window.innerWidth <= 768) closeMobileMenu();
             selectedCategory = null;
-            
+            unblockChat(); // Desbloquear chat al crear nuevo
+            loadedFeedbacks = {}; // Limpiar feedbacks anteriores
+
             if (currentConversationId && localConversations[currentConversationId]) {
                 var currentConv = localConversations[currentConversationId];
                 if (currentConv.isNew && !currentConv.hasMessages) {
@@ -1900,20 +1902,20 @@
                     return;
                 }
             }
-            
+
             var tempId = generateTempId();
             var newConv = { id: tempId, title: 'Nueva Conversación', category: 'general', messages: [], hasMessages: false, isNew: true };
-            
+
             localConversations[tempId] = newConv;
             currentConversationId = tempId;
             currentConversationTitle = 'Nueva Conversación';
             currentChatHasMessages = false;
-            
+
             document.querySelectorAll('.chat-history-item').forEach(function(el) { el.classList.remove('active'); });
-            
+
             var item = addConversationToSidebar({ id: tempId, title: 'Nueva Conversación', messages: [{ content: 'Escribe tu primer mensaje...' }], category: 'general', isNew: true }, true);
             item.classList.add('active');
-            
+
             updateWelcomeSection();
             document.getElementById('welcomeSection').style.display = 'flex';
             document.getElementById('messagesArea').classList.remove('active');
@@ -2051,10 +2053,10 @@
                     }
                     
                     if (result.botMessage && localConversations[sendingToConversationId]) {
-                        localConversations[sendingToConversationId].messages.push({ content: result.botMessage.content, sender: 'bot', createdAt: new Date().toISOString() });
+                        localConversations[sendingToConversationId].messages.push({ content: result.botMessage.content, sender: 'bot', createdAt: new Date().toISOString(), id: result.botMessage.id });
                     }
-                    
-                    if (result.botMessage && stillInSameChat) addMessageToUI(result.botMessage.content, false, null, null, true);
+
+                    if (result.botMessage && stillInSameChat) addMessageToUI(result.botMessage.content, false, null, null, true, result.botMessage.id);
                     moveConversationToTop(sendingToConversationId);
                 } else {
                     if (stillInSameChat) addMessageToUI('Lo siento, hubo un error. Por favor intenta de nuevo.', false, null, null, true);
