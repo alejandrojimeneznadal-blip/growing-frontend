@@ -576,7 +576,7 @@
         .settings-option-label { font-size: 0.875rem; color: var(--text-primary); }
 
         /* Search Modal */
-        .search-modal { width: 500px; max-width: 95%; }
+        .modal-content.search-modal { width: 500px; max-width: 95%; }
         .search-input-container { position: relative; margin-bottom: 1rem; }
         .search-input-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--text-secondary); }
         .search-input { padding-left: 40px !important; }
@@ -1070,8 +1070,8 @@
     </div>
 
     <!-- Search Modal -->
-    <div class="modal-overlay" id="searchModal">
-        <div class="modal search-modal">
+    <div class="modal" id="searchModal">
+        <div class="modal-content search-modal">
             <div class="modal-header">
                 <h3 class="modal-title">Buscar conversaciones</h3>
                 <button class="modal-close" onclick="closeSearchModal()"><svg class="icon" viewBox="0 0 24 24" stroke="currentColor" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
