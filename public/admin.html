@@ -1154,6 +1154,27 @@
         </div>
     </div>
 
+    <!-- Admin Role Confirmation Modal -->
+    <div class="modal" id="adminRoleModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="adminModalTitle">Cambiar Rol</h3>
+                <button class="modal-close" onclick="closeAdminRoleModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="adminModalText" style="color: var(--text-secondary);">¿Estás seguro de que deseas cambiar el rol de este usuario?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAdminRoleModal()">Cancelar</button>
+                <button class="btn btn-primary" id="adminModalBtn" onclick="executeToggleAdmin()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Delete User Confirmation Modal -->
     <div class="modal" id="deleteUserModal">
         <div class="modal-content" style="max-width: 400px;">
@@ -2166,6 +2187,8 @@
         let showAdminsOnly = false;
         let pendingBlockUserId = null;
         let pendingBlockStatus = null;
+        let pendingAdminUserId = null;
+        let pendingAdminRole = null;
 
         async function loadUsers() {
             const tbody = document.getElementById('usersTableBody');
@@ -2287,7 +2310,7 @@
 
             const modal = document.getElementById('blockUserModal');
             const title = document.getElementById('blockModalTitle');
-            const message = document.getElementById('blockModalMessage');
+            const message = document.getElementById('blockModalText');
             const btn = document.getElementById('blockModalBtn');
 
             if (currentStatus) {
@@ -2349,19 +2372,47 @@
             }
         }
 
-        async function confirmToggleAdmin(userId, currentRole) {
+        function confirmToggleAdmin(userId, currentRole) {
+            pendingAdminUserId = userId;
+            pendingAdminRole = currentRole;
             const user = allUsers.find(u => u.id === userId);
             const userName = user ? user.name : 'este usuario';
             const newRole = currentRole === 'admin' ? 'user' : 'admin';
-            const action = newRole === 'admin' ? 'hacer administrador a' : 'quitar permisos de administrador a';
 
-            if (!confirm(`¿Estás seguro de que quieres ${action} ${userName}?`)) {
-                return;
+            const modal = document.getElementById('adminRoleModal');
+            const title = document.getElementById('adminModalTitle');
+            const message = document.getElementById('adminModalText');
+            const btn = document.getElementById('adminModalBtn');
+
+            if (newRole === 'admin') {
+                title.textContent = 'Hacer Administrador';
+                message.textContent = `¿Estás seguro de que quieres hacer administrador a ${userName}? Tendrá acceso completo al panel de administración.`;
+                btn.textContent = 'Hacer Admin';
+                btn.className = 'btn btn-primary';
+            } else {
+                title.textContent = 'Quitar Administrador';
+                message.textContent = `¿Estás seguro de que quieres quitar los permisos de administrador a ${userName}?`;
+                btn.textContent = 'Quitar Admin';
+                btn.className = 'btn btn-warning';
             }
+
+            modal.classList.add('active');
+        }
+
+        function closeAdminRoleModal() {
+            document.getElementById('adminRoleModal').classList.remove('active');
+            pendingAdminUserId = null;
+            pendingAdminRole = null;
+        }
+
+        async function executeToggleAdmin() {
+            if (!pendingAdminUserId) return;
+
+            const newRole = pendingAdminRole === 'admin' ? 'user' : 'admin';
 
             try {
                 const token = localStorage.getItem('authToken');
-                const response = await fetch(`${_API_URL}/admin/users/${userId}`, {
+                const response = await fetch(`${_API_URL}/admin/users/${pendingAdminUserId}`, {
                     method: 'PATCH',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -2375,10 +2426,11 @@
                     showToast(newRole === 'admin' ? 'Usuario promovido a administrador' : 'Permisos de administrador removidos', 'success');
 
                     // Update local data
-                    const userIndex = allUsers.findIndex(u => u.id === userId);
+                    const userIndex = allUsers.findIndex(u => u.id === pendingAdminUserId);
                     if (userIndex !== -1) {
                         allUsers[userIndex].role = newRole;
                     }
+                    closeAdminRoleModal();
                     filterUsers();
                 } else {
                     showToast(result.message || 'Error al actualizar rol', 'error');
