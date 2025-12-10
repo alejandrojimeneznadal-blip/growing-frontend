@@ -1580,6 +1580,50 @@
             addWord();
         }
 
+        function typeWriterHTMLWithCallback(element, html, speed, callback) {
+            speed = speed || 30;
+            // Parsear el HTML para separar texto de elementos
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+
+            var nodes = [];
+            function extractNodes(parent) {
+                for (var i = 0; i < parent.childNodes.length; i++) {
+                    var node = parent.childNodes[i];
+                    if (node.nodeType === 3) { // Text node
+                        var words = node.textContent.split(' ');
+                        words.forEach(function(word, idx) {
+                            if (word) nodes.push({ type: 'word', content: word, addSpace: idx > 0 });
+                        });
+                    } else if (node.nodeType === 1) { // Element node
+                        nodes.push({ type: 'element', content: node.outerHTML });
+                    }
+                }
+            }
+            extractNodes(tempDiv);
+
+            var currentIndex = 0;
+            element.innerHTML = '';
+
+            function addNext() {
+                if (currentIndex < nodes.length) {
+                    var node = nodes[currentIndex];
+                    if (node.type === 'word') {
+                        element.innerHTML += (node.addSpace ? ' ' : '') + node.content;
+                    } else {
+                        element.innerHTML += node.content;
+                    }
+                    currentIndex++;
+                    var messagesArea = document.getElementById('messagesArea');
+                    messagesArea.scrollTop = messagesArea.scrollHeight;
+                    setTimeout(addNext, node.type === 'element' ? 0 : speed);
+                } else {
+                    if (callback) callback();
+                }
+            }
+            addNext();
+        }
+
         // FIX 2: addMessageToUI corregido para animar texto con Loom
         function addMessageToUI(text, isUser, timestamp, imageData, animate, messageId) {
             if (animate === undefined) animate = true;
@@ -1621,20 +1665,35 @@
             if (text && textDiv) {
                 if (!isUser && animate) {
                     if (hasLoom) {
-                        // Con Loom: mostrar todo de golpe con spinner sobre el video
+                        // Con Loom: animar texto y mostrar video en su posición
                         var iframeMatch = text.match(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi);
-                        var textWithIframeReplaced = text;
+                        var placeholderId = 'loom-ph-' + Date.now();
+                        var textWithPlaceholder = text;
+
                         if (iframeMatch) {
-                            iframeMatch.forEach(function(iframe) {
-                                textWithIframeReplaced = textWithIframeReplaced.replace(iframe, addSpinnerToIframe(iframe));
+                            // Reemplazar iframe con placeholder
+                            iframeMatch.forEach(function(iframe, idx) {
+                                textWithPlaceholder = textWithPlaceholder.replace(iframe, '<div id="' + placeholderId + '-' + idx + '" class="loom-placeholder"></div>');
                             });
                         }
-                        textDiv.innerHTML = textWithIframeReplaced;
-                        setTimeout(function() {
-                            var feedbackComponent = createFeedbackComponent(msgId);
-                            div.appendChild(feedbackComponent);
-                            scrollToBottom();
-                        }, 500);
+
+                        // Animar el texto con placeholder
+                        typeWriterHTMLWithCallback(textDiv, textWithPlaceholder, 25, function() {
+                            // Reemplazar placeholders con iframes reales
+                            if (iframeMatch) {
+                                iframeMatch.forEach(function(iframe, idx) {
+                                    var placeholder = document.getElementById(placeholderId + '-' + idx);
+                                    if (placeholder) {
+                                        placeholder.outerHTML = addSpinnerToIframe(iframe);
+                                    }
+                                });
+                            }
+                            setTimeout(function() {
+                                var feedbackComponent = createFeedbackComponent(msgId);
+                                div.appendChild(feedbackComponent);
+                                scrollToBottom();
+                            }, 300);
+                        });
                     } else {
                         typeWriter(textDiv, text, 25);
                     }
