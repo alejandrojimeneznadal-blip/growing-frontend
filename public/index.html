@@ -706,14 +706,23 @@
         .escalation-loom { margin-bottom: 1rem; border-radius: 8px; overflow: hidden; }
 
         /* Loom loader simple */
+        .loom-wrapper {
+            position: relative;
+        }
+        .escalation-loom .loom-wrapper {
+            margin-top: 0;
+        }
         .loom-spinner {
-            display: block;
-            width: 24px; height: 24px;
-            border: 2px solid var(--border-color);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 32px; height: 32px;
+            border: 3px solid var(--border-color);
             border-top-color: var(--primary-blue);
             border-radius: 50%;
             animation: loomSpin 0.7s linear infinite;
-            margin: 0 auto 0.5rem auto;
+            z-index: 10;
         }
         .loom-spinner.hidden { display: none; }
         @keyframes loomSpin { to { transform: rotate(360deg); } }
@@ -1339,8 +1348,8 @@
 
         function addSpinnerToIframe(iframeHtml) {
             var spinnerId = 'spinner-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
-            return '<div style="text-align:center;"><div class="loom-spinner" id="' + spinnerId + '"></div></div>' +
-                iframeHtml.replace('<iframe', '<iframe onload="document.getElementById(\'' + spinnerId + '\').parentElement.style.display=\'none\';"');
+            return '<div class="loom-wrapper"><div class="loom-spinner" id="' + spinnerId + '"></div>' +
+                iframeHtml.replace('<iframe', '<iframe onload="document.getElementById(\'' + spinnerId + '\').classList.add(\'hidden\');"') + '</div>';
         }
 
         // ==================== UI FUNCTIONS ====================
@@ -1611,20 +1620,34 @@
             if (text && textDiv) {
                 if (!isUser && animate) {
                     if (hasLoom) {
-                        // FIX: Separar texto del iframe, animar texto, luego añadir iframe
+                        // Insertar iframe con spinner en su posición, luego animar texto
                         var iframeMatch = text.match(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi);
-                        var textWithoutIframe = text.replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, '').trim();
-                        
-                        if (textWithoutIframe) {
-                            typeWriterWithCallback(textDiv, textWithoutIframe, 25, function() {
-                                if (iframeMatch) {
-                                    iframeMatch.forEach(function(iframe) {
-                                        var iframeDiv = document.createElement('div');
-                                        iframeDiv.style.marginTop = '1rem';
-                                        iframeDiv.innerHTML = addSpinnerToIframe(iframe);
-                                        textDiv.appendChild(iframeDiv);
-                                    });
-                                }
+                        var textWithIframeReplaced = text;
+
+                        if (iframeMatch) {
+                            iframeMatch.forEach(function(iframe) {
+                                textWithIframeReplaced = textWithIframeReplaced.replace(iframe, addSpinnerToIframe(iframe));
+                            });
+                        }
+
+                        // Poner el HTML completo primero (iframe visible con spinner)
+                        textDiv.innerHTML = textWithIframeReplaced;
+
+                        // Extraer solo el texto para animar
+                        var textOnly = text.replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, '').trim();
+                        if (textOnly) {
+                            // Guardar referencia al wrapper del loom
+                            var loomWrapper = textDiv.querySelector('.loom-wrapper');
+                            // Limpiar el texto pero mantener el iframe
+                            textDiv.innerHTML = '';
+                            if (loomWrapper) {
+                                textDiv.appendChild(loomWrapper);
+                            }
+                            // Crear span para el texto animado
+                            var textSpan = document.createElement('span');
+                            textDiv.insertBefore(textSpan, loomWrapper);
+
+                            typeWriterWithCallback(textSpan, textOnly, 25, function() {
                                 setTimeout(function() {
                                     var feedbackComponent = createFeedbackComponent(msgId);
                                     div.appendChild(feedbackComponent);
@@ -1632,7 +1655,6 @@
                                 }, 300);
                             });
                         } else {
-                            textDiv.innerHTML = text;
                             setTimeout(function() {
                                 var feedbackComponent = createFeedbackComponent(msgId);
                                 div.appendChild(feedbackComponent);
@@ -1643,13 +1665,22 @@
                         typeWriter(textDiv, text, 25);
                     }
                 } else {
-                    textDiv.innerHTML = text;
                     if (hasLoom && !isUser) {
+                        var iframeMatch = text.match(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi);
+                        var textWithIframeReplaced = text;
+                        if (iframeMatch) {
+                            iframeMatch.forEach(function(iframe) {
+                                textWithIframeReplaced = textWithIframeReplaced.replace(iframe, addSpinnerToIframe(iframe));
+                            });
+                        }
+                        textDiv.innerHTML = textWithIframeReplaced;
                         setTimeout(function() {
                             var feedbackComponent = createFeedbackComponent(msgId);
                             div.appendChild(feedbackComponent);
                             scrollToBottom();
                         }, 500);
+                    } else {
+                        textDiv.innerHTML = text;
                     }
                 }
             }
