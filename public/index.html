@@ -1339,8 +1339,8 @@
 
         function addSpinnerToIframe(iframeHtml) {
             var spinnerId = 'spinner-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
-            return '<div class="loom-spinner" id="' + spinnerId + '"></div>' +
-                iframeHtml.replace('<iframe', '<iframe onload="document.getElementById(\'' + spinnerId + '\').classList.add(\'hidden\');"');
+            return '<div style="text-align:center;"><div class="loom-spinner" id="' + spinnerId + '"></div></div>' +
+                iframeHtml.replace('<iframe', '<iframe onload="document.getElementById(\'' + spinnerId + '\').parentElement.style.display=\'none\';"');
         }
 
         // ==================== UI FUNCTIONS ====================
