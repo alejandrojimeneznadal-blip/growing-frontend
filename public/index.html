@@ -716,8 +716,9 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
             width: 32px; height: 32px;
+            margin-left: -16px;
+            margin-top: -16px;
             border: 3px solid var(--border-color);
             border-top-color: var(--primary-blue);
             border-radius: 50%;
@@ -1620,47 +1621,20 @@
             if (text && textDiv) {
                 if (!isUser && animate) {
                     if (hasLoom) {
-                        // Insertar iframe con spinner en su posición, luego animar texto
+                        // Con Loom: mostrar todo de golpe con spinner sobre el video
                         var iframeMatch = text.match(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi);
                         var textWithIframeReplaced = text;
-
                         if (iframeMatch) {
                             iframeMatch.forEach(function(iframe) {
                                 textWithIframeReplaced = textWithIframeReplaced.replace(iframe, addSpinnerToIframe(iframe));
                             });
                         }
-
-                        // Poner el HTML completo primero (iframe visible con spinner)
                         textDiv.innerHTML = textWithIframeReplaced;
-
-                        // Extraer solo el texto para animar
-                        var textOnly = text.replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, '').trim();
-                        if (textOnly) {
-                            // Guardar referencia al wrapper del loom
-                            var loomWrapper = textDiv.querySelector('.loom-wrapper');
-                            // Limpiar el texto pero mantener el iframe
-                            textDiv.innerHTML = '';
-                            if (loomWrapper) {
-                                textDiv.appendChild(loomWrapper);
-                            }
-                            // Crear span para el texto animado
-                            var textSpan = document.createElement('span');
-                            textDiv.insertBefore(textSpan, loomWrapper);
-
-                            typeWriterWithCallback(textSpan, textOnly, 25, function() {
-                                setTimeout(function() {
-                                    var feedbackComponent = createFeedbackComponent(msgId);
-                                    div.appendChild(feedbackComponent);
-                                    scrollToBottom();
-                                }, 300);
-                            });
-                        } else {
-                            setTimeout(function() {
-                                var feedbackComponent = createFeedbackComponent(msgId);
-                                div.appendChild(feedbackComponent);
-                                scrollToBottom();
-                            }, 500);
-                        }
+                        setTimeout(function() {
+                            var feedbackComponent = createFeedbackComponent(msgId);
+                            div.appendChild(feedbackComponent);
+                            scrollToBottom();
+                        }, 500);
                     } else {
                         typeWriter(textDiv, text, 25);
                     }
