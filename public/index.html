@@ -669,7 +669,7 @@
             transition: all var(--transition-fast); line-height: 1;
             display: inline-block;
         }
-        .feedback-star:hover { color: #FBBF24; transform: scale(1.2) rotate(-5deg); }
+        .feedback-star.hover { color: #FBBF24; transform: scale(1.1); }
         .feedback-star.active { color: #FBBF24; animation: starPop 0.3s var(--ease-out-back); }
         @keyframes starPop {
             0% { transform: scale(1); }
@@ -1119,9 +1119,29 @@
         function createStarsHTML(feedbackId, type) {
             var html = '';
             for (var i = 1; i <= 5; i++) {
-                html += '<span class="feedback-star" data-rating="' + i + '" onclick="handleStarRating(\'' + feedbackId + '\', \'' + type + '\', ' + i + ')">☆</span>';
+                html += '<span class="feedback-star" data-rating="' + i + '" onclick="handleStarRating(\'' + feedbackId + '\', \'' + type + '\', ' + i + ')" onmouseenter="highlightStars(this, ' + i + ')" onmouseleave="resetStarsHighlight(this)">☆</span>';
             }
             return html;
+        }
+
+        function highlightStars(starElement, rating) {
+            var container = starElement.parentElement;
+            var stars = container.querySelectorAll('.feedback-star');
+            stars.forEach(function(star, index) {
+                if (index < rating) {
+                    star.classList.add('hover');
+                } else {
+                    star.classList.remove('hover');
+                }
+            });
+        }
+
+        function resetStarsHighlight(starElement) {
+            var container = starElement.parentElement;
+            var stars = container.querySelectorAll('.feedback-star');
+            stars.forEach(function(star) {
+                star.classList.remove('hover');
+            });
         }
 
         function handleFeedbackThumb(feedbackId, resolved) {
