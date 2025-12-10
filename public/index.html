@@ -215,7 +215,7 @@
             transition: height var(--transition-normal);
         }
         .chat-history-item:hover {
-            background-color: var(--light-blue-bg); transform: translateX(4px);
+            transform: translateX(4px);
         }
         .chat-history-item:hover::before { height: 50%; }
         .chat-history-item.active {
@@ -240,7 +240,6 @@
             border: 1px solid var(--primary-blue); border-radius: 4px;
             transition: all var(--transition-fast);
         }
-        .chat-history-item:hover .chat-history-category { background-color: var(--primary-blue); color: white; }
 
         .chat-history-empty { padding: 2rem 1rem; text-align: center; color: var(--text-secondary); font-size: 0.875rem; }
         .chat-history-item.loading {
@@ -354,12 +353,9 @@
             opacity: 0; transition: opacity var(--transition-normal);
         }
         .category-card:hover {
-            border-color: var(--primary-blue);
             box-shadow: var(--shadow-lg), 0 20px 40px rgba(22, 106, 136, 0.15);
             transform: translateY(-6px) rotateX(2deg);
-            background-color: var(--light-blue-bg);
         }
-        .category-card:hover::after { opacity: 1; }
         .category-card:active { transform: translateY(-2px) scale(0.98); transition: all 0.1s; }
         .category-card.selected {
             border-color: var(--primary-blue); background-color: var(--light-blue-bg);
