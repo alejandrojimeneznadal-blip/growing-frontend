@@ -232,113 +232,124 @@
         .stat-value { font-size: 2rem; font-weight: 700; color: var(--primary-blue); margin-top: 0.25rem; }
 
         /* Metrics Dashboard Styles */
-        .metrics-section { margin-bottom: 2.5rem; }
+        .metrics-section { margin-bottom: 2rem; }
         .metrics-header {
             display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 1.5rem; padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
         }
-        .metrics-title { font-size: 1.25rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem; }
-        .metrics-title-icon { width: 24px; height: 24px; color: var(--primary-blue); }
-        .metrics-subtitle { font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem; }
+        .metrics-title { font-size: 1.125rem; font-weight: 600; color: var(--text-primary); }
+        .metrics-subtitle { font-size: 0.8125rem; color: var(--text-secondary); margin-top: 0.125rem; }
 
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
+        /* Main metrics row - 3 big cards */
+        .metrics-row-main {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        /* Secondary metrics row - 3 smaller cards */
+        .metrics-row-secondary {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+        }
 
         .metric-card {
             background: var(--bg-primary); border: 1px solid var(--border-color);
-            border-radius: 16px; padding: 1.5rem; position: relative; overflow: hidden;
+            border-radius: 16px; padding: 1.5rem; position: relative;
             transition: all 0.2s ease;
         }
-        .metric-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
-        .metric-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-            background: linear-gradient(90deg, var(--primary-blue), var(--bright-cyan));
-        }
-        .metric-card.success::before { background: linear-gradient(90deg, #10B981, #34D399); }
-        .metric-card.warning::before { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
-        .metric-card.danger::before { background: linear-gradient(90deg, #EF4444, #F87171); }
+        .metric-card:hover { box-shadow: var(--shadow-md); border-color: var(--primary-blue); }
 
-        .metric-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem; }
+        .metric-card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+        .metric-label { font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); }
         .metric-icon {
-            width: 48px; height: 48px; border-radius: 12px;
+            width: 40px; height: 40px; border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            background: var(--light-blue-bg);
         }
-        .metric-icon svg { width: 24px; height: 24px; color: var(--primary-blue); }
-        .metric-icon.success { background: rgba(16, 185, 129, 0.1); }
-        .metric-icon.success svg { color: #10B981; }
-        .metric-icon.warning { background: rgba(245, 158, 11, 0.1); }
-        .metric-icon.warning svg { color: #F59E0B; }
-        .metric-icon.danger { background: rgba(239, 68, 68, 0.1); }
-        .metric-icon.danger svg { color: #EF4444; }
+        .metric-icon svg { width: 20px; height: 20px; }
+        .metric-icon.blue { background: linear-gradient(135deg, #34BCFF 0%, #41F2F9 100%); }
+        .metric-icon.blue svg { color: white; }
+        .metric-icon.green { background: linear-gradient(135deg, #10B981 0%, #34D399 100%); }
+        .metric-icon.green svg { color: white; }
+        .metric-icon.yellow { background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%); }
+        .metric-icon.yellow svg { color: white; }
+        .metric-icon.purple { background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%); }
+        .metric-icon.purple svg { color: white; }
+        .metric-icon.red { background: linear-gradient(135deg, #EF4444 0%, #F87171 100%); }
+        .metric-icon.red svg { color: white; }
+        .metric-icon.cyan { background: linear-gradient(135deg, #06B6D4 0%, #22D3EE 100%); }
+        .metric-icon.cyan svg { color: white; }
 
-        .metric-badge {
-            font-size: 0.75rem; font-weight: 500; padding: 0.25rem 0.5rem;
-            border-radius: 6px; background: var(--light-blue-bg); color: var(--primary-blue);
-        }
+        .metric-value-row { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.75rem; }
+        .metric-value { font-size: 2.75rem; font-weight: 700; color: var(--text-primary); line-height: 1; }
+        .metric-unit { font-size: 1.25rem; font-weight: 500; color: var(--text-secondary); }
 
-        .metric-content { margin-bottom: 0.75rem; }
-        .metric-label { font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
-        .metric-value { font-size: 2.5rem; font-weight: 700; color: var(--text-primary); line-height: 1; }
-        .metric-value.small { font-size: 1.75rem; }
-        .metric-unit { font-size: 1rem; font-weight: 500; color: var(--text-secondary); margin-left: 0.25rem; }
-
-        .metric-footer { display: flex; align-items: center; gap: 0.5rem; }
-        .metric-trend { display: flex; align-items: center; gap: 0.25rem; font-size: 0.8125rem; font-weight: 500; }
-        .metric-trend.up { color: #10B981; }
-        .metric-trend.down { color: #EF4444; }
-        .metric-trend svg { width: 16px; height: 16px; }
         .metric-detail { font-size: 0.8125rem; color: var(--text-secondary); }
 
         .metric-progress { margin-top: 1rem; }
         .metric-progress-bar {
-            height: 8px; background: var(--bg-secondary); border-radius: 4px; overflow: hidden;
+            height: 6px; background: var(--bg-secondary); border-radius: 3px; overflow: hidden;
         }
         .metric-progress-fill {
-            height: 100%; border-radius: 4px; transition: width 0.5s ease;
-            background: linear-gradient(90deg, var(--primary-blue), var(--bright-cyan));
+            height: 100%; border-radius: 3px; transition: width 0.6s ease;
         }
-        .metric-progress-fill.success { background: linear-gradient(90deg, #10B981, #34D399); }
-        .metric-progress-fill.warning { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
-        .metric-progress-fill.danger { background: linear-gradient(90deg, #EF4444, #F87171); }
+        .metric-progress-fill.blue { background: linear-gradient(90deg, #34BCFF, #41F2F9); }
+        .metric-progress-fill.green { background: linear-gradient(90deg, #10B981, #34D399); }
+        .metric-progress-fill.yellow { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+        .metric-progress-fill.red { background: linear-gradient(90deg, #EF4444, #F87171); }
 
-        .metric-stars { display: flex; gap: 0.25rem; margin-top: 0.5rem; }
-        .metric-star { width: 20px; height: 20px; color: #E5E7EB; }
+        .metric-stars { display: flex; gap: 0.375rem; margin-top: 0.25rem; }
+        .metric-star { width: 24px; height: 24px; }
         .metric-star.filled { color: #FBBF24; }
-        .metric-star.half { color: #FBBF24; }
+        .metric-star.empty { color: #E5E7EB; }
 
-        .metric-breakdown { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); }
+        .metric-breakdown { margin-top: 1.25rem; }
         .metric-breakdown-item {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0.5rem 0; font-size: 0.8125rem;
+            padding: 0.625rem 0; border-bottom: 1px solid var(--border-color);
         }
-        .metric-breakdown-label { color: var(--text-secondary); display: flex; align-items: center; gap: 0.5rem; }
-        .metric-breakdown-dot { width: 8px; height: 8px; border-radius: 50%; }
-        .metric-breakdown-dot.comercial { background: #F59E0B; }
-        .metric-breakdown-dot.meta-ads { background: #6366F1; }
-        .metric-breakdown-dot.gohighlevel { background: #06B6D4; }
-        .metric-breakdown-value { font-weight: 600; color: var(--text-primary); }
+        .metric-breakdown-item:last-child { border-bottom: none; }
+        .metric-breakdown-label {
+            color: var(--text-primary); font-size: 0.875rem; font-weight: 500;
+            display: flex; align-items: center; gap: 0.625rem;
+        }
+        .metric-breakdown-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .metric-breakdown-dot.comercial { background: linear-gradient(135deg, #F59E0B, #FBBF24); }
+        .metric-breakdown-dot.meta-ads { background: linear-gradient(135deg, #6366F1, #818CF8); }
+        .metric-breakdown-dot.gohighlevel { background: linear-gradient(135deg, #06B6D4, #22D3EE); }
+        .metric-breakdown-value {
+            font-size: 1.125rem; font-weight: 700; color: var(--text-primary);
+            background: var(--bg-secondary); padding: 0.25rem 0.75rem; border-radius: 6px;
+        }
 
         .metrics-loading {
             display: flex; align-items: center; justify-content: center;
-            padding: 3rem; color: var(--text-secondary);
+            padding: 4rem; color: var(--text-secondary); grid-column: 1 / -1;
+        }
+
+        @media (max-width: 1024px) {
+            .metrics-row-main, .metrics-row-secondary { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .metrics-row-main, .metrics-row-secondary { grid-template-columns: 1fr; }
         }
 
         /* Tabs for switching views */
         .admin-tabs {
-            display: flex; gap: 0.5rem; margin-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;
+            display: flex; gap: 0.25rem; margin-bottom: 2rem;
+            background: var(--bg-secondary); padding: 0.375rem; border-radius: 12px;
+            width: fit-content;
         }
         .admin-tab {
-            padding: 0.75rem 1.25rem; border-radius: 8px 8px 0 0;
+            padding: 0.625rem 1.25rem; border-radius: 8px;
             font-size: 0.875rem; font-weight: 500; cursor: pointer;
             background: transparent; border: none; color: var(--text-secondary);
             transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem;
         }
-        .admin-tab:hover { background: var(--light-blue-bg); color: var(--text-primary); }
+        .admin-tab:hover { color: var(--text-primary); }
         .admin-tab.active {
-            background: var(--light-blue-bg); color: var(--primary-blue);
-            border-bottom: 2px solid var(--primary-blue); margin-bottom: -1px;
+            background: var(--bg-primary); color: var(--primary-blue);
+            box-shadow: var(--shadow-sm);
         }
         .admin-tab svg { width: 18px; height: 18px; }
 
@@ -555,7 +566,7 @@
     <header class="header">
         <div style="display: flex; align-items: center; gap: 1rem;">
             <div>
-                <h1 class="header-title">Base de Conocimientos</h1>
+                <h1 class="header-title">Panel de Administrador</h1>
                 <p class="header-subtitle">Gestiona los recursos del asistente de Growing</p>
             </div>
             <button class="help-btn" onclick="openHelpModal()">
@@ -608,14 +619,8 @@
             <div class="metrics-section">
                 <div class="metrics-header">
                     <div>
-                        <h2 class="metrics-title">
-                            <svg class="metrics-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                <polyline points="22 4 12 14.01 9 11.01"/>
-                            </svg>
-                            Dashboard de Satisfacción
-                        </h2>
-                        <p class="metrics-subtitle">Métricas del chatbot de soporte en tiempo real</p>
+                        <h2 class="metrics-title">Métricas de Satisfacción</h2>
+                        <p class="metrics-subtitle">Rendimiento del chatbot en tiempo real</p>
                     </div>
                     <button class="btn btn-secondary" onclick="loadFeedbackStats()">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -626,10 +631,12 @@
                     </button>
                 </div>
 
-                <div class="metrics-grid" id="metricsGrid">
-                    <div class="metrics-loading">
-                        <div class="loading loading-dark"></div>
-                        <span style="margin-left: 0.75rem;">Cargando métricas...</span>
+                <div id="metricsContainer">
+                    <div class="metrics-row-main">
+                        <div class="metrics-loading">
+                            <div class="loading loading-dark"></div>
+                            <span style="margin-left: 0.75rem;">Cargando métricas...</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1642,11 +1649,13 @@
         }
 
         async function loadFeedbackStats() {
-            const grid = document.getElementById('metricsGrid');
-            grid.innerHTML = `
-                <div class="metrics-loading" style="grid-column: 1 / -1;">
-                    <div class="loading loading-dark"></div>
-                    <span style="margin-left: 0.75rem;">Cargando métricas...</span>
+            const container = document.getElementById('metricsContainer');
+            container.innerHTML = `
+                <div class="metrics-row-main">
+                    <div class="metrics-loading">
+                        <div class="loading loading-dark"></div>
+                        <span style="margin-left: 0.75rem;">Cargando métricas...</span>
+                    </div>
                 </div>
             `;
 
@@ -1660,175 +1669,173 @@
                 if (result.success) {
                     renderMetrics(result.data);
                 } else {
-                    grid.innerHTML = `<div class="metrics-loading" style="grid-column: 1 / -1;">Error al cargar métricas</div>`;
+                    container.innerHTML = `<div class="metrics-row-main"><div class="metrics-loading">Error al cargar métricas</div></div>`;
                 }
             } catch (error) {
                 console.error('Error loading feedback stats:', error);
-                grid.innerHTML = `<div class="metrics-loading" style="grid-column: 1 / -1;">Error de conexión</div>`;
+                container.innerHTML = `<div class="metrics-row-main"><div class="metrics-loading">Error de conexión</div></div>`;
             }
         }
 
         function renderMetrics(data) {
-            const grid = document.getElementById('metricsGrid');
+            const container = document.getElementById('metricsContainer');
             const { summary, resolution, ratings, clarity, escalation } = data;
 
             // Determine colors based on values
-            const resolutionColor = resolution.rate >= 70 ? 'success' : resolution.rate >= 50 ? 'warning' : 'danger';
-            const escalationColor = escalation.rate <= 20 ? 'success' : escalation.rate <= 40 ? 'warning' : 'danger';
-            const clarityColor = clarity.rate >= 70 ? 'success' : clarity.rate >= 50 ? 'warning' : 'danger';
+            const resolutionColor = resolution.rate >= 70 ? 'green' : resolution.rate >= 50 ? 'yellow' : 'red';
+            const escalationColor = escalation.rate <= 20 ? 'green' : escalation.rate <= 40 ? 'yellow' : 'red';
+            const clarityColor = clarity.rate >= 70 ? 'green' : clarity.rate >= 50 ? 'yellow' : 'red';
 
-            grid.innerHTML = `
-                <!-- Tasa de Resolución -->
-                <div class="metric-card ${resolutionColor}">
-                    <div class="metric-header">
-                        <div class="metric-icon ${resolutionColor}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                <polyline points="22 4 12 14.01 9 11.01"/>
-                            </svg>
+            container.innerHTML = `
+                <!-- Fila principal: 3 métricas principales -->
+                <div class="metrics-row-main">
+                    <!-- Tasa de Resolución -->
+                    <div class="metric-card">
+                        <div class="metric-card-header">
+                            <span class="metric-label">Tasa de Resolución</span>
+                            <div class="metric-icon ${resolutionColor}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="metric-value-row">
+                            <span class="metric-value">${resolution.rate}</span>
+                            <span class="metric-unit">%</span>
+                        </div>
+                        <div class="metric-detail">${resolution.resolved} resueltas de ${summary.totalFeedback} consultas</div>
+                        <div class="metric-progress">
+                            <div class="metric-progress-bar">
+                                <div class="metric-progress-fill ${resolutionColor}" style="width: ${resolution.rate}%"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="metric-content">
-                        <div class="metric-label">Tasa de Resolución</div>
-                        <div class="metric-value">${resolution.rate}<span class="metric-unit">%</span></div>
-                    </div>
-                    <div class="metric-footer">
-                        <span class="metric-detail">${resolution.resolved} resueltas de ${summary.totalFeedback} consultas</span>
-                    </div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar">
-                            <div class="metric-progress-fill ${resolutionColor}" style="width: ${resolution.rate}%"></div>
+
+                    <!-- Calidad de Respuesta -->
+                    <div class="metric-card">
+                        <div class="metric-card-header">
+                            <span class="metric-label">Calidad de Respuesta</span>
+                            <div class="metric-icon yellow">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                            </div>
                         </div>
+                        <div class="metric-value-row">
+                            <span class="metric-value">${ratings.quality ? ratings.quality.toFixed(1) : '-'}</span>
+                            <span class="metric-unit">/ 5</span>
+                        </div>
+                        <div class="metric-stars">
+                            ${renderStars(ratings.quality || 0)}
+                        </div>
+                        <div class="metric-detail" style="margin-top: 0.75rem;">Promedio de valoraciones</div>
+                    </div>
+
+                    <!-- Velocidad de Respuesta -->
+                    <div class="metric-card">
+                        <div class="metric-card-header">
+                            <span class="metric-label">Velocidad de Respuesta</span>
+                            <div class="metric-icon blue">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="metric-value-row">
+                            <span class="metric-value">${ratings.speed ? ratings.speed.toFixed(1) : '-'}</span>
+                            <span class="metric-unit">/ 5</span>
+                        </div>
+                        <div class="metric-stars">
+                            ${renderStars(ratings.speed || 0)}
+                        </div>
+                        <div class="metric-detail" style="margin-top: 0.75rem;">Promedio de valoraciones</div>
                     </div>
                 </div>
 
-                <!-- Calidad de Respuesta -->
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                            </svg>
+                <!-- Fila secundaria: 3 métricas secundarias -->
+                <div class="metrics-row-secondary">
+                    <!-- Claridad de Pasos -->
+                    <div class="metric-card">
+                        <div class="metric-card-header">
+                            <span class="metric-label">Claridad de Pasos</span>
+                            <div class="metric-icon purple">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 11l3 3L22 4"/>
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="metric-value-row">
+                            <span class="metric-value">${clarity.rate}</span>
+                            <span class="metric-unit">%</span>
+                        </div>
+                        <div class="metric-detail">${clarity.clear} usuarios con pasos claros</div>
+                        <div class="metric-progress">
+                            <div class="metric-progress-bar">
+                                <div class="metric-progress-fill ${clarityColor}" style="width: ${clarity.rate}%"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="metric-content">
-                        <div class="metric-label">Calidad de Respuesta</div>
-                        <div class="metric-value">${ratings.quality ? ratings.quality.toFixed(1) : '-'}<span class="metric-unit">/ 5</span></div>
-                    </div>
-                    <div class="metric-stars">
-                        ${renderStars(ratings.quality || 0)}
-                    </div>
-                    <div class="metric-footer" style="margin-top: 0.75rem;">
-                        <span class="metric-detail">Promedio de valoraciones de calidad</span>
-                    </div>
-                </div>
 
-                <!-- Velocidad de Respuesta -->
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"/>
-                                <polyline points="12 6 12 12 16 14"/>
-                            </svg>
+                    <!-- Tasa de Escalación -->
+                    <div class="metric-card">
+                        <div class="metric-card-header">
+                            <span class="metric-label">Tasa de Escalación</span>
+                            <div class="metric-icon red">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 1l4 4-4 4"/>
+                                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                                    <path d="M7 23l-4-4 4-4"/>
+                                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="metric-value-row">
+                            <span class="metric-value">${escalation.rate}</span>
+                            <span class="metric-unit">%</span>
+                        </div>
+                        <div class="metric-detail">${escalation.total} escaladas a humanos</div>
+                        <div class="metric-progress">
+                            <div class="metric-progress-bar">
+                                <div class="metric-progress-fill ${escalationColor}" style="width: ${escalation.rate}%"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="metric-content">
-                        <div class="metric-label">Velocidad de Respuesta</div>
-                        <div class="metric-value">${ratings.speed ? ratings.speed.toFixed(1) : '-'}<span class="metric-unit">/ 5</span></div>
-                    </div>
-                    <div class="metric-stars">
-                        ${renderStars(ratings.speed || 0)}
-                    </div>
-                    <div class="metric-footer" style="margin-top: 0.75rem;">
-                        <span class="metric-detail">Promedio de valoraciones de velocidad</span>
-                    </div>
-                </div>
 
-                <!-- Claridad de Pasos -->
-                <div class="metric-card ${clarityColor}">
-                    <div class="metric-header">
-                        <div class="metric-icon ${clarityColor}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 11l3 3L22 4"/>
-                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-                            </svg>
+                    <!-- Escalaciones por Categoría -->
+                    <div class="metric-card">
+                        <div class="metric-card-header">
+                            <span class="metric-label">Desglose por Categoría</span>
+                            <div class="metric-icon cyan">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                            </div>
                         </div>
-                    </div>
-                    <div class="metric-content">
-                        <div class="metric-label">Claridad de Pasos</div>
-                        <div class="metric-value">${clarity.rate}<span class="metric-unit">%</span></div>
-                    </div>
-                    <div class="metric-footer">
-                        <span class="metric-detail">${clarity.clear} usuarios encontraron los pasos claros</span>
-                    </div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar">
-                            <div class="metric-progress-fill ${clarityColor}" style="width: ${clarity.rate}%"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tasa de Escalación -->
-                <div class="metric-card ${escalationColor}">
-                    <div class="metric-header">
-                        <div class="metric-icon ${escalationColor}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M17 1l4 4-4 4"/>
-                                <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-                                <path d="M7 23l-4-4 4-4"/>
-                                <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="metric-content">
-                        <div class="metric-label">Tasa de Escalación</div>
-                        <div class="metric-value">${escalation.rate}<span class="metric-unit">%</span></div>
-                    </div>
-                    <div class="metric-footer">
-                        <span class="metric-detail">${escalation.total} consultas escaladas a humanos</span>
-                    </div>
-                    <div class="metric-progress">
-                        <div class="metric-progress-bar">
-                            <div class="metric-progress-fill ${escalationColor}" style="width: ${escalation.rate}%"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Escalaciones por Categoría -->
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <div class="metric-icon warning">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="metric-content">
-                        <div class="metric-label">Escalaciones por Categoría</div>
-                        <div class="metric-value small">${escalation.total}<span class="metric-unit">total</span></div>
-                    </div>
-                    <div class="metric-breakdown">
-                        <div class="metric-breakdown-item">
-                            <span class="metric-breakdown-label">
-                                <span class="metric-breakdown-dot comercial"></span>
-                                Comercial
-                            </span>
-                            <span class="metric-breakdown-value">${escalation.byCategory.comercial || 0}</span>
-                        </div>
-                        <div class="metric-breakdown-item">
-                            <span class="metric-breakdown-label">
-                                <span class="metric-breakdown-dot meta-ads"></span>
-                                Meta Ads
-                            </span>
-                            <span class="metric-breakdown-value">${escalation.byCategory['meta-ads'] || 0}</span>
-                        </div>
-                        <div class="metric-breakdown-item">
-                            <span class="metric-breakdown-label">
-                                <span class="metric-breakdown-dot gohighlevel"></span>
-                                GoHighLevel
-                            </span>
-                            <span class="metric-breakdown-value">${escalation.byCategory.gohighlevel || 0}</span>
+                        <div class="metric-breakdown">
+                            <div class="metric-breakdown-item">
+                                <span class="metric-breakdown-label">
+                                    <span class="metric-breakdown-dot comercial"></span>
+                                    Comercial
+                                </span>
+                                <span class="metric-breakdown-value">${escalation.byCategory.comercial || 0}</span>
+                            </div>
+                            <div class="metric-breakdown-item">
+                                <span class="metric-breakdown-label">
+                                    <span class="metric-breakdown-dot meta-ads"></span>
+                                    Meta Ads
+                                </span>
+                                <span class="metric-breakdown-value">${escalation.byCategory['meta-ads'] || 0}</span>
+                            </div>
+                            <div class="metric-breakdown-item">
+                                <span class="metric-breakdown-label">
+                                    <span class="metric-breakdown-dot gohighlevel"></span>
+                                    GoHighLevel
+                                </span>
+                                <span class="metric-breakdown-value">${escalation.byCategory.gohighlevel || 0}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1841,9 +1848,9 @@
                 if (i <= Math.floor(rating)) {
                     html += `<svg class="metric-star filled" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
                 } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
-                    html += `<svg class="metric-star half" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.5;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+                    html += `<svg class="metric-star filled" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.5;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
                 } else {
-                    html += `<svg class="metric-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+                    html += `<svg class="metric-star empty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
                 }
             }
             return html;
