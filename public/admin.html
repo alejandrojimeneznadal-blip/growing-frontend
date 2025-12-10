@@ -900,8 +900,15 @@
                         <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
                         </svg>
-                        <input type="text" class="search-input" id="usersSearchInput" placeholder="Buscar por nombre o email..." oninput="filterUsers()">
+                        <input type="text" class="search-input" id="usersSearchInput" placeholder="Buscar por nombre, email o empresa..." oninput="filterUsers()">
                     </div>
+                    <button class="users-filter-btn" id="adminFilterBtn" onclick="toggleAdminFilter()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+                        </svg>
+                        Solo admins
+                    </button>
                     <button class="users-filter-btn" id="blockedFilterBtn" onclick="toggleBlockedFilter()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="12" r="10"/>
@@ -1122,6 +1129,27 @@
                         <div class="users-empty" style="padding: 1rem;">Sin conversaciones</div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Block User Confirmation Modal -->
+    <div class="modal" id="blockUserModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="blockModalTitle">Bloquear Usuario</h3>
+                <button class="modal-close" onclick="closeBlockUserModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="blockModalText" style="color: var(--text-secondary);">¿Estás seguro de que deseas bloquear este usuario? No podrá acceder al sistema ni crear nuevas cuentas con el mismo email o IP.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeBlockUserModal()">Cancelar</button>
+                <button class="btn btn-danger" id="blockModalBtn" onclick="executeBlockUser()">Bloquear Usuario</button>
             </div>
         </div>
     </div>
@@ -2135,6 +2163,9 @@
         let allUsers = [];
         let selectedUserId = null;
         let showBlockedOnly = false;
+        let showAdminsOnly = false;
+        let pendingBlockUserId = null;
+        let pendingBlockStatus = null;
 
         async function loadUsers() {
             const tbody = document.getElementById('usersTableBody');
@@ -2190,7 +2221,13 @@
                     <td>${formatDate(user.createdAt)}</td>
                     <td>
                         <div class="user-actions-cell">
-                            <button class="user-action-btn" onclick="toggleUserBlockDirect('${user.id}', ${user.isActive})" title="${user.isActive ? 'Bloquear' : 'Desbloquear'}">
+                            <button class="user-action-btn" onclick="confirmToggleAdmin('${user.id}', '${user.role}')" title="${user.role === 'admin' ? 'Quitar admin' : 'Hacer admin'}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+                                </svg>
+                            </button>
+                            <button class="user-action-btn" onclick="confirmBlockUser('${user.id}', ${user.isActive})" title="${user.isActive ? 'Bloquear' : 'Desbloquear'}">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     ${user.isActive
                                         ? '<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>'
@@ -2214,19 +2251,142 @@
             const search = document.getElementById('usersSearchInput').value.toLowerCase();
             let filtered = allUsers.filter(user =>
                 user.name.toLowerCase().includes(search) ||
-                user.email.toLowerCase().includes(search)
+                user.email.toLowerCase().includes(search) ||
+                (user.company && user.company.toLowerCase().includes(search))
             );
             if (showBlockedOnly) {
                 filtered = filtered.filter(user => !user.isActive);
+            }
+            if (showAdminsOnly) {
+                filtered = filtered.filter(user => user.role === 'admin');
             }
             renderUsers(filtered);
         }
 
         function toggleBlockedFilter() {
             showBlockedOnly = !showBlockedOnly;
-            const btn = document.getElementById('blockedFilterBtn');
-            btn.classList.toggle('active', showBlockedOnly);
+            if (showBlockedOnly) showAdminsOnly = false;
+            document.getElementById('blockedFilterBtn').classList.toggle('active', showBlockedOnly);
+            document.getElementById('adminFilterBtn').classList.toggle('active', showAdminsOnly);
             filterUsers();
+        }
+
+        function toggleAdminFilter() {
+            showAdminsOnly = !showAdminsOnly;
+            if (showAdminsOnly) showBlockedOnly = false;
+            document.getElementById('adminFilterBtn').classList.toggle('active', showAdminsOnly);
+            document.getElementById('blockedFilterBtn').classList.toggle('active', showBlockedOnly);
+            filterUsers();
+        }
+
+        function confirmBlockUser(userId, currentStatus) {
+            pendingBlockUserId = userId;
+            pendingBlockStatus = currentStatus;
+            const user = allUsers.find(u => u.id === userId);
+            const userName = user ? user.name : 'este usuario';
+
+            const modal = document.getElementById('blockUserModal');
+            const title = document.getElementById('blockModalTitle');
+            const message = document.getElementById('blockModalMessage');
+            const btn = document.getElementById('blockModalBtn');
+
+            if (currentStatus) {
+                // User is active, we're going to block them
+                title.textContent = 'Bloquear Usuario';
+                message.textContent = `¿Estás seguro de que quieres bloquear a ${userName}? Se bloqueará su email e IP para evitar que cree nuevas cuentas.`;
+                btn.textContent = 'Bloquear Usuario';
+                btn.className = 'btn btn-danger';
+            } else {
+                // User is blocked, we're going to unblock them
+                title.textContent = 'Desbloquear Usuario';
+                message.textContent = `¿Quieres desbloquear a ${userName}? Podrá acceder de nuevo a su cuenta.`;
+                btn.textContent = 'Desbloquear Usuario';
+                btn.className = 'btn btn-primary';
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeBlockUserModal() {
+            document.getElementById('blockUserModal').classList.remove('active');
+            pendingBlockUserId = null;
+            pendingBlockStatus = null;
+        }
+
+        async function executeBlockUser() {
+            if (!pendingBlockUserId) return;
+
+            const newStatus = !pendingBlockStatus;
+
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`${_API_URL}/admin/users/${pendingBlockUserId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ isActive: newStatus })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(newStatus ? 'Usuario desbloqueado' : 'Usuario bloqueado', 'success');
+
+                    // Update local data
+                    const userIndex = allUsers.findIndex(u => u.id === pendingBlockUserId);
+                    if (userIndex !== -1) {
+                        allUsers[userIndex].isActive = newStatus;
+                    }
+                    closeBlockUserModal();
+                    filterUsers();
+                } else {
+                    showToast('Error al actualizar usuario', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating user:', error);
+                showToast('Error de conexión', 'error');
+            }
+        }
+
+        async function confirmToggleAdmin(userId, currentRole) {
+            const user = allUsers.find(u => u.id === userId);
+            const userName = user ? user.name : 'este usuario';
+            const newRole = currentRole === 'admin' ? 'user' : 'admin';
+            const action = newRole === 'admin' ? 'hacer administrador a' : 'quitar permisos de administrador a';
+
+            if (!confirm(`¿Estás seguro de que quieres ${action} ${userName}?`)) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`${_API_URL}/admin/users/${userId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ role: newRole })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(newRole === 'admin' ? 'Usuario promovido a administrador' : 'Permisos de administrador removidos', 'success');
+
+                    // Update local data
+                    const userIndex = allUsers.findIndex(u => u.id === userId);
+                    if (userIndex !== -1) {
+                        allUsers[userIndex].role = newRole;
+                    }
+                    filterUsers();
+                } else {
+                    showToast(result.message || 'Error al actualizar rol', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating user role:', error);
+                showToast('Error de conexión', 'error');
+            }
         }
 
         function getInitials(name) {
