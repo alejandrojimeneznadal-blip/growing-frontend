@@ -630,16 +630,27 @@
         .feedback-question.hidden { display: none; }
         .feedback-question-text { font-weight: 400; }
 
-        .feedback-thumbs { display: inline-flex; align-items: center; margin-left: 0.5rem; border-radius: 8px; overflow: hidden; }
+        .feedback-thumbs { display: inline-flex; align-items: center; margin-left: 0.5rem; }
         .feedback-thumb {
-            width: 32px; height: 26px; border: none;
+            width: 36px; height: 26px; border: none;
             cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
             transition: all var(--transition-fast); padding: 0;
         }
         .feedback-thumb svg { width: 14px; height: 14px; transition: transform var(--transition-fast); }
-        .feedback-thumb.thumb-down { background: #FEE2E2; }
+        .feedback-thumb.thumb-down {
+            background: #FEE2E2;
+            clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%);
+            border-radius: 8px 0 0 8px;
+            padding-right: 4px;
+        }
         .feedback-thumb.thumb-down svg { stroke: #DC2626; }
-        .feedback-thumb.thumb-up { background: #D1FAE5; }
+        .feedback-thumb.thumb-up {
+            background: #D1FAE5;
+            clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%);
+            border-radius: 0 8px 8px 0;
+            margin-left: -6px;
+            padding-left: 4px;
+        }
         .feedback-thumb.thumb-up svg { stroke: #059669; }
         .feedback-thumb:hover { transform: scale(1.05); }
         .feedback-thumb:hover svg { transform: scale(1.15); }
