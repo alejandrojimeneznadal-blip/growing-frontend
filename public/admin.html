@@ -356,6 +356,146 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
+        /* Two column layout for recursos tab */
+        .recursos-layout {
+            display: grid; grid-template-columns: 1fr 400px; gap: 1.5rem;
+        }
+        @media (max-width: 1200px) {
+            .recursos-layout { grid-template-columns: 1fr; }
+        }
+
+        .recursos-panel, .usuarios-panel {
+            background: var(--bg-primary); border: 1px solid var(--border-color);
+            border-radius: 16px; overflow: hidden;
+        }
+        .panel-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+        .panel-title {
+            font-size: 1rem; font-weight: 600; color: var(--text-primary);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .panel-title svg { width: 20px; height: 20px; color: var(--primary-blue); }
+        .panel-content { padding: 1rem; }
+
+        /* Users list */
+        .users-list { max-height: 600px; overflow-y: auto; }
+        .user-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.875rem 1rem; border-bottom: 1px solid var(--border-color);
+            cursor: pointer; transition: background 0.15s;
+        }
+        .user-item:last-child { border-bottom: none; }
+        .user-item:hover { background: var(--bg-secondary); }
+        .user-item.selected { background: var(--light-blue-bg); }
+        .user-item.blocked { opacity: 0.6; }
+
+        .user-info { display: flex; align-items: center; gap: 0.75rem; flex: 1; min-width: 0; }
+        .user-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--bright-cyan));
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 0.875rem; flex-shrink: 0;
+        }
+        .user-details { min-width: 0; flex: 1; }
+        .user-name {
+            font-weight: 500; color: var(--text-primary); font-size: 0.875rem;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .user-email {
+            font-size: 0.75rem; color: var(--text-secondary);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .user-meta { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+        .user-badge {
+            font-size: 0.625rem; font-weight: 600; padding: 0.25rem 0.5rem;
+            border-radius: 4px; text-transform: uppercase;
+        }
+        .user-badge.admin { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
+        .user-badge.user { background: rgba(107, 114, 128, 0.1); color: #6B7280; }
+        .user-badge.blocked { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
+
+        .user-actions { display: flex; gap: 0.25rem; }
+        .user-action-btn {
+            width: 32px; height: 32px; border-radius: 6px; border: none;
+            background: transparent; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; transition: all 0.15s;
+        }
+        .user-action-btn svg { width: 16px; height: 16px; color: var(--text-secondary); }
+        .user-action-btn:hover { background: var(--bg-secondary); }
+        .user-action-btn:hover svg { color: var(--text-primary); }
+        .user-action-btn.danger:hover { background: rgba(239, 68, 68, 0.1); }
+        .user-action-btn.danger:hover svg { color: #EF4444; }
+
+        .users-empty {
+            padding: 3rem 1rem; text-align: center; color: var(--text-secondary);
+        }
+        .users-search {
+            padding: 1rem; border-bottom: 1px solid var(--border-color);
+        }
+        .users-search input {
+            width: 100%; padding: 0.625rem 1rem; border: 1px solid var(--border-color);
+            border-radius: 8px; font-size: 0.875rem; background: var(--bg-primary);
+        }
+        .users-search input:focus {
+            outline: none; border-color: var(--primary-blue);
+        }
+
+        /* User detail modal */
+        .user-detail-modal .modal-body { padding: 0; }
+        .user-profile-header {
+            padding: 1.5rem; background: linear-gradient(135deg, var(--primary-blue), var(--bright-cyan));
+            color: white; text-align: center;
+        }
+        .user-profile-avatar {
+            width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: 700; margin: 0 auto 0.75rem;
+        }
+        .user-profile-name { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .user-profile-email { font-size: 0.875rem; opacity: 0.9; }
+
+        .user-profile-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .user-stat {
+            padding: 1rem; text-align: center;
+            border-right: 1px solid var(--border-color);
+        }
+        .user-stat:last-child { border-right: none; }
+        .user-stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary-blue); }
+        .user-stat-label { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem; }
+
+        .user-profile-actions {
+            padding: 1rem 1.5rem; display: flex; gap: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .user-profile-actions .btn { flex: 1; justify-content: center; }
+
+        .user-conversations { padding: 1rem 1.5rem; max-height: 300px; overflow-y: auto; }
+        .user-conversations-title {
+            font-size: 0.875rem; font-weight: 600; color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+        .conversation-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.75rem; border-radius: 8px; cursor: pointer;
+            transition: background 0.15s; margin-bottom: 0.5rem;
+        }
+        .conversation-item:hover { background: var(--bg-secondary); }
+        .conversation-title {
+            font-size: 0.8125rem; font-weight: 500; color: var(--text-primary);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;
+        }
+        .conversation-date { font-size: 0.75rem; color: var(--text-secondary); }
+        .conversation-messages {
+            font-size: 0.75rem; color: var(--text-secondary);
+            background: var(--bg-secondary); padding: 0.125rem 0.5rem; border-radius: 4px;
+        }
+
         .table-container { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
         .table { width: 100%; border-collapse: collapse; }
         .table th, .table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
@@ -644,103 +784,125 @@
 
         <!-- Recursos Tab Content -->
         <div class="tab-content" id="recursosTab">
-            <div class="stats-grid" id="statsGrid">
-                <div class="stat-card">
-                    <div class="stat-label">Total Recursos</div>
-                    <div class="stat-value" id="statTotal">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Videos</div>
-                    <div class="stat-value" id="statVideos">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">PDFs</div>
-                    <div class="stat-value" id="statPDFs">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Artículos</div>
-                    <div class="stat-value" id="statArticulos">0</div>
-                </div>
-            </div>
+            <div class="recursos-layout">
+                <!-- Panel izquierdo: Base de Conocimientos -->
+                <div class="recursos-panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            Base de Conocimientos
+                        </h3>
+                        <div class="stats-mini">
+                            <span id="statTotalMini">0</span> recursos
+                        </div>
+                    </div>
 
-            <div class="toolbar">
-            <div class="search-box">
-                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-                </svg>
-                <input type="text" class="search-input" id="searchInput" placeholder="Buscar recursos..." oninput="handleSearch()">
-            </div>
-            
-            <!-- Custom Dropdown: Tipo -->
-            <div class="custom-select" id="filterTipoDropdown">
-                <div class="custom-select-trigger" onclick="toggleDropdown('filterTipoDropdown')">
-                    <span>Todos los tipos</span>
-                    <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M6 9l6 6 6-6"/>
-                    </svg>
-                </div>
-                <div class="custom-select-options">
-                    <div class="custom-select-option selected" data-value="" onclick="selectOption('filterTipoDropdown', '', 'Todos los tipos')">Todos los tipos</div>
-                    <div class="custom-select-option" data-value="video" onclick="selectOption('filterTipoDropdown', 'video', 'Videos')">Videos</div>
-                    <div class="custom-select-option" data-value="pdf" onclick="selectOption('filterTipoDropdown', 'pdf', 'PDFs')">PDFs</div>
-                    <div class="custom-select-option" data-value="articulo" onclick="selectOption('filterTipoDropdown', 'articulo', 'Artículos')">Artículos</div>
-                </div>
-                <select class="filter-select" id="filterTipo">
-                    <option value="">Todos los tipos</option>
-                    <option value="video">Videos</option>
-                    <option value="pdf">PDFs</option>
-                    <option value="articulo">Artículos</option>
-                </select>
-            </div>
+                    <div class="toolbar" style="padding: 1rem; border-bottom: 1px solid var(--border-color);">
+                        <div class="search-box">
+                            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                            </svg>
+                            <input type="text" class="search-input" id="searchInput" placeholder="Buscar recursos..." oninput="handleSearch()">
+                        </div>
 
-            <!-- Custom Dropdown: Categoría -->
-            <div class="custom-select" id="filterCategoriaDropdown">
-                <div class="custom-select-trigger" onclick="toggleDropdown('filterCategoriaDropdown')">
-                    <span>Todas las categorías</span>
-                    <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M6 9l6 6 6-6"/>
-                    </svg>
-                </div>
-                <div class="custom-select-options">
-                    <div class="custom-select-option selected" data-value="" onclick="selectOption('filterCategoriaDropdown', '', 'Todas las categorías')">Todas las categorías</div>
-                    <div class="custom-select-option" data-value="comercial" onclick="selectOption('filterCategoriaDropdown', 'comercial', 'Comercial')">Comercial</div>
-                    <div class="custom-select-option" data-value="meta-ads" onclick="selectOption('filterCategoriaDropdown', 'meta-ads', 'Meta Ads')">Meta Ads</div>
-                    <div class="custom-select-option" data-value="gohighlevel" onclick="selectOption('filterCategoriaDropdown', 'gohighlevel', 'GoHighLevel')">GoHighLevel</div>
-                    <div class="custom-select-option" data-value="general" onclick="selectOption('filterCategoriaDropdown', 'general', 'General')">General</div>
-                </div>
-                <select class="filter-select" id="filterCategoria">
-                    <option value="">Todas las categorías</option>
-                    <option value="comercial">Comercial</option>
-                    <option value="meta-ads">Meta Ads</option>
-                    <option value="gohighlevel">GoHighLevel</option>
-                    <option value="general">General</option>
-                </select>
-            </div>
-        </div>
+                        <div class="custom-select" id="filterTipoDropdown">
+                            <div class="custom-select-trigger" onclick="toggleDropdown('filterTipoDropdown')">
+                                <span>Todos los tipos</span>
+                                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M6 9l6 6 6-6"/>
+                                </svg>
+                            </div>
+                            <div class="custom-select-options">
+                                <div class="custom-select-option selected" data-value="" onclick="selectOption('filterTipoDropdown', '', 'Todos los tipos')">Todos los tipos</div>
+                                <div class="custom-select-option" data-value="video" onclick="selectOption('filterTipoDropdown', 'video', 'Videos')">Videos</div>
+                                <div class="custom-select-option" data-value="pdf" onclick="selectOption('filterTipoDropdown', 'pdf', 'PDFs')">PDFs</div>
+                                <div class="custom-select-option" data-value="articulo" onclick="selectOption('filterTipoDropdown', 'articulo', 'Artículos')">Artículos</div>
+                            </div>
+                            <select class="filter-select" id="filterTipo">
+                                <option value="">Todos los tipos</option>
+                                <option value="video">Videos</option>
+                                <option value="pdf">PDFs</option>
+                                <option value="articulo">Artículos</option>
+                            </select>
+                        </div>
 
-        <div class="table-container">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Título</th>
-                        <th>Tipo</th>
-                        <th>Categoría</th>
-                        <th>Estado</th>
-                        <th>Actualizado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="recursosTable">
-                    <tr>
-                        <td colspan="6" class="empty-state">
+                        <div class="custom-select" id="filterCategoriaDropdown">
+                            <div class="custom-select-trigger" onclick="toggleDropdown('filterCategoriaDropdown')">
+                                <span>Todas las categorías</span>
+                                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M6 9l6 6 6-6"/>
+                                </svg>
+                            </div>
+                            <div class="custom-select-options">
+                                <div class="custom-select-option selected" data-value="" onclick="selectOption('filterCategoriaDropdown', '', 'Todas las categorías')">Todas las categorías</div>
+                                <div class="custom-select-option" data-value="comercial" onclick="selectOption('filterCategoriaDropdown', 'comercial', 'Comercial')">Comercial</div>
+                                <div class="custom-select-option" data-value="meta-ads" onclick="selectOption('filterCategoriaDropdown', 'meta-ads', 'Meta Ads')">Meta Ads</div>
+                                <div class="custom-select-option" data-value="gohighlevel" onclick="selectOption('filterCategoriaDropdown', 'gohighlevel', 'GoHighLevel')">GoHighLevel</div>
+                                <div class="custom-select-option" data-value="general" onclick="selectOption('filterCategoriaDropdown', 'general', 'General')">General</div>
+                            </div>
+                            <select class="filter-select" id="filterCategoria">
+                                <option value="">Todas las categorías</option>
+                                <option value="comercial">Comercial</option>
+                                <option value="meta-ads">Meta Ads</option>
+                                <option value="gohighlevel">GoHighLevel</option>
+                                <option value="general">General</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Tipo</th>
+                                    <th>Categoría</th>
+                                    <th>Estado</th>
+                                    <th>Actualizado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recursosTable">
+                                <tr>
+                                    <td colspan="6" class="empty-state">
+                                        <div class="loading loading-dark"></div>
+                                        <p style="margin-top: 1rem;">Cargando recursos...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination" id="pagination"></div>
+                    </div>
+                </div><!-- End recursos-panel -->
+
+                <!-- Panel derecho: Usuarios -->
+                <div class="usuarios-panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            Usuarios
+                        </h3>
+                        <span class="panel-count" id="usersCount">0</span>
+                    </div>
+                    <div class="users-search">
+                        <input type="text" id="usersSearchInput" placeholder="Buscar usuarios..." oninput="filterUsers()">
+                    </div>
+                    <div class="users-list" id="usersList">
+                        <div class="users-empty">
                             <div class="loading loading-dark"></div>
-                            <p style="margin-top: 1rem;">Cargando recursos...</p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="pagination" id="pagination"></div>
-        </div>
+                            <p style="margin-top: 0.75rem;">Cargando usuarios...</p>
+                        </div>
+                    </div>
+                </div><!-- End usuarios-panel -->
+            </div><!-- End recursos-layout -->
         </div><!-- End recursosTab -->
     </div>
 
@@ -876,6 +1038,84 @@
         </div>
     </div>
 
+    <!-- User Detail Modal -->
+    <div class="modal user-detail-modal" id="userModal">
+        <div class="modal-content" style="max-width: 480px;">
+            <div class="modal-header" style="border-bottom: none; padding: 0.75rem 1rem;">
+                <span></span>
+                <button class="modal-close" onclick="closeUserModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="user-profile-header">
+                    <div class="user-profile-avatar" id="userModalAvatar">A</div>
+                    <div class="user-profile-name" id="userModalName">Usuario</div>
+                    <div class="user-profile-email" id="userModalEmail">email@example.com</div>
+                </div>
+                <div class="user-profile-stats">
+                    <div class="user-stat">
+                        <div class="user-stat-value" id="userModalChats">0</div>
+                        <div class="user-stat-label">Conversaciones</div>
+                    </div>
+                    <div class="user-stat">
+                        <div class="user-stat-value" id="userModalMessages">0</div>
+                        <div class="user-stat-label">Mensajes</div>
+                    </div>
+                    <div class="user-stat">
+                        <div class="user-stat-value" id="userModalDays">0</div>
+                        <div class="user-stat-label">Días activo</div>
+                    </div>
+                </div>
+                <div class="user-profile-actions">
+                    <button class="btn btn-secondary" id="userBlockBtn" onclick="toggleUserBlock()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                        </svg>
+                        <span>Bloquear</span>
+                    </button>
+                    <button class="btn btn-danger" onclick="confirmDeleteUser()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                        <span>Eliminar</span>
+                    </button>
+                </div>
+                <div class="user-conversations">
+                    <div class="user-conversations-title">Conversaciones recientes</div>
+                    <div id="userConversationsList">
+                        <div class="users-empty" style="padding: 1rem;">Sin conversaciones</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete User Confirmation Modal -->
+    <div class="modal" id="deleteUserModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Eliminar Usuario</h3>
+                <button class="modal-close" onclick="closeDeleteUserModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-secondary);">¿Estás seguro de que deseas eliminar este usuario? Se eliminarán todas sus conversaciones y datos. Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteUserModal()">Cancelar</button>
+                <button class="btn btn-danger" onclick="executeDeleteUser()">Eliminar Usuario</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Delete Confirmation Modal -->
     <div class="modal" id="deleteModal">
         <div class="modal-content" style="max-width: 400px;">
@@ -1004,6 +1244,7 @@
 
             loadFeedbackStats(); // Load metrics on startup (default tab)
             loadRecursos();
+            loadUsers();
             setupDragDrop();
             
             // Cerrar dropdowns al hacer clic fuera
@@ -1854,6 +2095,253 @@
                 }
             }
             return html;
+        }
+
+        // ==================== USER MANAGEMENT FUNCTIONS ====================
+
+        let allUsers = [];
+        let selectedUserId = null;
+        let selectedUserData = null;
+
+        async function loadUsers() {
+            const list = document.getElementById('usersList');
+            list.innerHTML = `
+                <div class="users-empty">
+                    <div class="loading loading-dark"></div>
+                    <p style="margin-top: 0.75rem;">Cargando usuarios...</p>
+                </div>
+            `;
+
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`${_API_URL}/admin/users?limit=100`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    allUsers = result.data.users;
+                    document.getElementById('usersCount').textContent = allUsers.length;
+                    renderUsers(allUsers);
+                } else {
+                    list.innerHTML = `<div class="users-empty">Error al cargar usuarios</div>`;
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                list.innerHTML = `<div class="users-empty">Error de conexión</div>`;
+            }
+        }
+
+        function renderUsers(users) {
+            const list = document.getElementById('usersList');
+
+            if (users.length === 0) {
+                list.innerHTML = `<div class="users-empty">No hay usuarios</div>`;
+                return;
+            }
+
+            list.innerHTML = users.map(user => `
+                <div class="user-item ${!user.isActive ? 'blocked' : ''}" onclick="openUserModal('${user.id}')">
+                    <div class="user-info">
+                        <div class="user-avatar">${getInitials(user.name)}</div>
+                        <div class="user-details">
+                            <div class="user-name">${escapeHtml(user.name)}</div>
+                            <div class="user-email">${escapeHtml(user.email)}</div>
+                        </div>
+                    </div>
+                    <div class="user-meta">
+                        ${user.role === 'admin' ? '<span class="user-badge admin">Admin</span>' : ''}
+                        ${!user.isActive ? '<span class="user-badge blocked">Bloqueado</span>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterUsers() {
+            const search = document.getElementById('usersSearchInput').value.toLowerCase();
+            const filtered = allUsers.filter(user =>
+                user.name.toLowerCase().includes(search) ||
+                user.email.toLowerCase().includes(search)
+            );
+            renderUsers(filtered);
+        }
+
+        function getInitials(name) {
+            if (!name) return '?';
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function openUserModal(userId) {
+            selectedUserId = userId;
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            selectedUserData = user;
+
+            // Update modal with user info
+            document.getElementById('userModalAvatar').textContent = getInitials(user.name);
+            document.getElementById('userModalName').textContent = user.name;
+            document.getElementById('userModalEmail').textContent = user.email;
+
+            // Update block button text
+            const blockBtn = document.getElementById('userBlockBtn');
+            if (user.isActive) {
+                blockBtn.querySelector('span').textContent = 'Bloquear';
+                blockBtn.classList.remove('btn-success');
+                blockBtn.classList.add('btn-secondary');
+            } else {
+                blockBtn.querySelector('span').textContent = 'Desbloquear';
+                blockBtn.classList.remove('btn-secondary');
+                blockBtn.classList.add('btn-success');
+            }
+
+            // Load user details with conversations
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`${_API_URL}/admin/users/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    const userData = result.data;
+                    const conversations = userData.conversations || [];
+
+                    document.getElementById('userModalChats').textContent = conversations.length;
+
+                    // Calculate days active
+                    const createdAt = new Date(userData.createdAt);
+                    const now = new Date();
+                    const daysActive = Math.floor((now - createdAt) / (1000 * 60 * 60 * 24));
+                    document.getElementById('userModalDays').textContent = daysActive;
+
+                    // Messages count (estimate)
+                    document.getElementById('userModalMessages').textContent = '-';
+
+                    // Render conversations
+                    const convList = document.getElementById('userConversationsList');
+                    if (conversations.length === 0) {
+                        convList.innerHTML = `<div class="users-empty" style="padding: 1rem;">Sin conversaciones</div>`;
+                    } else {
+                        convList.innerHTML = conversations.slice(0, 10).map(conv => `
+                            <div class="conversation-item" onclick="viewConversation('${conv.id}')">
+                                <div>
+                                    <div class="conversation-title">${escapeHtml(conv.title || 'Sin título')}</div>
+                                    <div class="conversation-date">${formatDate(conv.createdAt)}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user details:', error);
+            }
+
+            document.getElementById('userModal').classList.add('active');
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.remove('active');
+            selectedUserId = null;
+            selectedUserData = null;
+        }
+
+        async function toggleUserBlock() {
+            if (!selectedUserId || !selectedUserData) return;
+
+            const newStatus = !selectedUserData.isActive;
+
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`${_API_URL}/admin/users/${selectedUserId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ isActive: newStatus })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(newStatus ? 'Usuario desbloqueado' : 'Usuario bloqueado', 'success');
+
+                    // Update local data
+                    const userIndex = allUsers.findIndex(u => u.id === selectedUserId);
+                    if (userIndex !== -1) {
+                        allUsers[userIndex].isActive = newStatus;
+                    }
+                    selectedUserData.isActive = newStatus;
+
+                    // Update button
+                    const blockBtn = document.getElementById('userBlockBtn');
+                    if (newStatus) {
+                        blockBtn.querySelector('span').textContent = 'Bloquear';
+                        blockBtn.classList.remove('btn-success');
+                        blockBtn.classList.add('btn-secondary');
+                    } else {
+                        blockBtn.querySelector('span').textContent = 'Desbloquear';
+                        blockBtn.classList.remove('btn-secondary');
+                        blockBtn.classList.add('btn-success');
+                    }
+
+                    // Re-render users list
+                    renderUsers(allUsers);
+                } else {
+                    showToast('Error al actualizar usuario', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating user:', error);
+                showToast('Error de conexión', 'error');
+            }
+        }
+
+        function confirmDeleteUser() {
+            document.getElementById('deleteUserModal').classList.add('active');
+        }
+
+        function closeDeleteUserModal() {
+            document.getElementById('deleteUserModal').classList.remove('active');
+        }
+
+        async function executeDeleteUser() {
+            if (!selectedUserId) return;
+
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`${_API_URL}/admin/users/${selectedUserId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Usuario eliminado', 'success');
+                    closeDeleteUserModal();
+                    closeUserModal();
+
+                    // Remove from local data
+                    allUsers = allUsers.filter(u => u.id !== selectedUserId);
+                    document.getElementById('usersCount').textContent = allUsers.length;
+                    renderUsers(allUsers);
+                } else {
+                    showToast(result.message || 'Error al eliminar usuario', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                showToast('Error de conexión', 'error');
+            }
+        }
+
+        function viewConversation(conversationId) {
+            // Could open a modal with conversation details or navigate
+            window.open(`/?conversation=${conversationId}`, '_blank');
         }
     </script>
 </body>
