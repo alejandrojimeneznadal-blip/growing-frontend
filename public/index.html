@@ -780,27 +780,18 @@
         .escalation-category-btn:hover { border-color: var(--primary-blue); }
         .escalation-category-btn.selected { background: var(--primary-blue); border-color: var(--primary-blue); color: white; }
 
-        .input-area.blocked .input-container { opacity: 0.5; pointer-events: none; }
-        .continue-chat-banner {
-            display: none; padding: 0.75rem 1rem; margin-bottom: 0.75rem;
-            background: var(--light-blue-bg); border: 1px solid var(--primary-blue);
-            border-radius: 8px; text-align: center; max-width: 900px; margin-left: auto; margin-right: auto;
-        }
-        .continue-chat-banner.active { display: block; }
-        .continue-chat-banner button {
-            background: var(--primary-blue); color: white; border: none;
-            padding: 0.5rem 1.5rem; border-radius: 6px; font-size: 0.875rem;
+        .input-area.blocked .input-container { display: none; }
+        .continue-chat-btn-inline {
+            display: none; width: 100%; padding: 1rem;
+            background: var(--light-blue-bg); border: 2px solid var(--primary-blue);
+            border-radius: 12px; color: var(--primary-blue); font-size: 0.9rem;
             font-weight: 500; cursor: pointer; transition: all 0.2s;
+            max-width: 900px; margin: 0 auto;
         }
-        .continue-chat-banner button:hover { background: var(--dark-blue); }
-        .blocked-overlay {
-            display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            color: var(--text-secondary); font-size: 0.875rem;
-        }
-        .input-area.blocked .blocked-overlay { display: block; }
+        .continue-chat-btn-inline:hover { background: var(--primary-blue); color: white; }
+        .input-area.blocked .continue-chat-btn-inline { display: block; }
         .input-area.blocked::after {
-            content: ''; position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            content: none;
             background: var(--bg-secondary); padding: 0.5rem 1rem;
             border-radius: 8px; font-size: 0.875rem; color: var(--text-secondary);
             border: 1px solid var(--border-color);
@@ -985,9 +976,7 @@
                 </div>
 
                 <div class="input-area">
-                    <div class="continue-chat-banner" id="continueChatBanner">
-                        <button onclick="continueChatFromBanner()">Continuar con el chat igualmente</button>
-                    </div>
+                    <button class="continue-chat-btn-inline" onclick="continueChatFromBanner()">Continuar con el chat igualmente</button>
                     <div class="input-container">
                         <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
                         <button class="attach-btn" id="attachBtn" onclick="document.getElementById('imageInput').click()" title="Adjuntar imagen">
@@ -1454,12 +1443,10 @@
         function blockChat() {
             var inputArea = document.querySelector('.input-area');
             if (inputArea) inputArea.classList.add('blocked');
-            document.getElementById('continueChatBanner').classList.add('active');
         }
         function unblockChat() {
             var inputArea = document.querySelector('.input-area');
             if (inputArea) inputArea.classList.remove('blocked');
-            document.getElementById('continueChatBanner').classList.remove('active');
         }
 
         var currentEscalationFeedbackId = null;
