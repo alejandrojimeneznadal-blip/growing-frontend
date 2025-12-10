@@ -722,10 +722,11 @@
         .feedback-thanks::before { content: '✓'; font-weight: 600; }
 
         .escalation-panel {
-            margin-top: 1rem; padding: 1.25rem;
+            margin-top: 1rem; padding: 1rem;
             background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(239, 68, 68, 0.1) 100%);
             border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 12px;
             animation: messageAppear 0.3s ease-out;
+            max-width: 500px;
         }
         .escalation-title { font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem; }
         .escalation-subtitle { font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem; }
@@ -779,10 +780,27 @@
         .escalation-category-btn:hover { border-color: var(--primary-blue); }
         .escalation-category-btn.selected { background: var(--primary-blue); border-color: var(--primary-blue); color: white; }
 
-        .input-area.blocked { opacity: 0.5; pointer-events: none; }
+        .input-area.blocked .input-container { opacity: 0.5; pointer-events: none; }
+        .continue-chat-banner {
+            display: none; padding: 0.75rem 1rem; margin-bottom: 0.75rem;
+            background: var(--light-blue-bg); border: 1px solid var(--primary-blue);
+            border-radius: 8px; text-align: center; max-width: 900px; margin-left: auto; margin-right: auto;
+        }
+        .continue-chat-banner.active { display: block; }
+        .continue-chat-banner button {
+            background: var(--primary-blue); color: white; border: none;
+            padding: 0.5rem 1.5rem; border-radius: 6px; font-size: 0.875rem;
+            font-weight: 500; cursor: pointer; transition: all 0.2s;
+        }
+        .continue-chat-banner button:hover { background: var(--dark-blue); }
+        .blocked-overlay {
+            display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: var(--text-secondary); font-size: 0.875rem;
+        }
+        .input-area.blocked .blocked-overlay { display: block; }
         .input-area.blocked::after {
-            content: 'Chat delegado al equipo'; position: absolute;
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            content: ''; position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: var(--bg-secondary); padding: 0.5rem 1rem;
             border-radius: 8px; font-size: 0.875rem; color: var(--text-secondary);
             border: 1px solid var(--border-color);
@@ -967,6 +985,9 @@
                 </div>
 
                 <div class="input-area">
+                    <div class="continue-chat-banner" id="continueChatBanner">
+                        <button onclick="continueChatFromBanner()">Continuar con el chat igualmente</button>
+                    </div>
                     <div class="input-container">
                         <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
                         <button class="attach-btn" id="attachBtn" onclick="document.getElementById('imageInput').click()" title="Adjuntar imagen">
@@ -1191,8 +1212,9 @@
                 html += '<div class="escalation-content" style="display: none;"></div>';
             }
 
+            // Mostrar banner de continuar si no ha continuado
             if (!storedFeedback.continuedAfterEscalation) {
-                html += '<button class="escalation-continue-btn" onclick="continueChat(\'' + feedbackId + '\')" style="margin-top: 1rem;">Continuar con el chat igualmente</button>';
+                blockChat();
             }
 
             panel.innerHTML = html;
@@ -1397,8 +1419,6 @@
                 html += getEscalationContentHTML(category);
             }
             
-            html += '<button class="escalation-continue-btn" onclick="continueChat(\'' + feedbackId + '\')" style="margin-top: 1rem;">Continuar con el chat igualmente</button>';
-            
             panel.innerHTML = html;
             container.appendChild(panel);
             blockChat();
@@ -1431,12 +1451,36 @@
                 '<a href="' + resources.doc + '" target="_blank" class="escalation-doc-link"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Abrir plantilla de solicitud</a>';
         }
 
-        function blockChat() { var inputArea = document.querySelector('.input-area'); if (inputArea) inputArea.classList.add('blocked'); }
-        function unblockChat() { var inputArea = document.querySelector('.input-area'); if (inputArea) inputArea.classList.remove('blocked'); }
+        function blockChat() {
+            var inputArea = document.querySelector('.input-area');
+            if (inputArea) inputArea.classList.add('blocked');
+            document.getElementById('continueChatBanner').classList.add('active');
+        }
+        function unblockChat() {
+            var inputArea = document.querySelector('.input-area');
+            if (inputArea) inputArea.classList.remove('blocked');
+            document.getElementById('continueChatBanner').classList.remove('active');
+        }
+
+        var currentEscalationFeedbackId = null;
 
         function continueChat(feedbackId) {
+            currentEscalationFeedbackId = feedbackId;
             unblockChat();
             saveFeedback(feedbackId, { continuedAfterEscalation: true });
+            document.getElementById('messageInput').focus();
+        }
+
+        function continueChatFromBanner() {
+            unblockChat();
+            // Buscar el feedbackId activo y guardar
+            var feedbackContainers = document.querySelectorAll('.loom-feedback');
+            feedbackContainers.forEach(function(container) {
+                var messageId = container.getAttribute('data-message-id');
+                if (messageId && loadedFeedbacks[messageId] && loadedFeedbacks[messageId].resolved === false) {
+                    saveFeedback(container.id, { continuedAfterEscalation: true });
+                }
+            });
             document.getElementById('messageInput').focus();
         }
 
