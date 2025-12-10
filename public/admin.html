@@ -356,41 +356,42 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Two column layout for recursos tab */
-        .recursos-layout {
-            display: grid; grid-template-columns: 1fr 400px; gap: 1.5rem;
+        /* Users section styles */
+        .users-section { }
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 1.5rem;
         }
-        @media (max-width: 1200px) {
-            .recursos-layout { grid-template-columns: 1fr; }
+        .section-title { font-size: 1.25rem; font-weight: 600; color: var(--text-primary); }
+        .section-subtitle { font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem; }
+        .users-stats { display: flex; gap: 1.5rem; }
+        .users-stat-item {
+            font-size: 0.875rem; color: var(--text-secondary);
+            background: var(--bg-primary); padding: 0.5rem 1rem;
+            border-radius: 8px; border: 1px solid var(--border-color);
+        }
+        .users-stat-item strong { color: var(--primary-blue); }
+        .users-stat-item.blocked strong { color: #EF4444; }
+
+        .users-toolbar { margin-bottom: 1.5rem; }
+        .users-toolbar .search-box { max-width: 400px; }
+
+        .users-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1rem;
+        }
+        .users-loading {
+            grid-column: 1 / -1; padding: 3rem; text-align: center;
+            color: var(--text-secondary);
         }
 
-        .recursos-panel, .usuarios-panel {
+        .user-card {
             background: var(--bg-primary); border: 1px solid var(--border-color);
-            border-radius: 16px; overflow: hidden;
+            border-radius: 12px; padding: 1.25rem; cursor: pointer;
+            transition: all 0.2s;
         }
-        .panel-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color);
-            background: var(--bg-secondary);
-        }
-        .panel-title {
-            font-size: 1rem; font-weight: 600; color: var(--text-primary);
-            display: flex; align-items: center; gap: 0.5rem;
-        }
-        .panel-title svg { width: 20px; height: 20px; color: var(--primary-blue); }
-        .panel-content { padding: 1rem; }
-
-        /* Users list */
-        .users-list { max-height: 600px; overflow-y: auto; }
-        .user-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0.875rem 1rem; border-bottom: 1px solid var(--border-color);
-            cursor: pointer; transition: background 0.15s;
-        }
-        .user-item:last-child { border-bottom: none; }
-        .user-item:hover { background: var(--bg-secondary); }
-        .user-item.selected { background: var(--light-blue-bg); }
-        .user-item.blocked { opacity: 0.6; }
+        .user-card:hover { border-color: var(--primary-blue); box-shadow: var(--shadow-md); }
+        .user-card.blocked { opacity: 0.7; border-color: #FCA5A5; }
 
         .user-info { display: flex; align-items: center; gap: 0.75rem; flex: 1; min-width: 0; }
         .user-avatar {
@@ -743,7 +744,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M18 20V10M12 20V4M6 20v-6"/>
                 </svg>
-                Métricas de Satisfacción
+                Métricas
             </button>
             <button class="admin-tab" onclick="switchTab('recursos')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -751,6 +752,15 @@
                     <polyline points="14 2 14 8 20 8"/>
                 </svg>
                 Base de Conocimientos
+            </button>
+            <button class="admin-tab" onclick="switchTab('usuarios')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                Usuarios
             </button>
         </div>
 
@@ -784,126 +794,133 @@
 
         <!-- Recursos Tab Content -->
         <div class="tab-content" id="recursosTab">
-            <div class="recursos-layout">
-                <!-- Panel izquierdo: Base de Conocimientos -->
-                <div class="recursos-panel">
-                    <div class="panel-header">
-                        <h3 class="panel-title">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                            </svg>
-                            Base de Conocimientos
-                        </h3>
-                        <div class="stats-mini">
-                            <span id="statTotalMini">0</span> recursos
-                        </div>
-                    </div>
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Recursos</div>
+                    <div class="stat-value" id="statTotal">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Videos</div>
+                    <div class="stat-value" id="statVideos">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">PDFs</div>
+                    <div class="stat-value" id="statPDFs">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Artículos</div>
+                    <div class="stat-value" id="statArticulos">0</div>
+                </div>
+            </div>
 
-                    <div class="toolbar" style="padding: 1rem; border-bottom: 1px solid var(--border-color);">
-                        <div class="search-box">
-                            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-                            </svg>
-                            <input type="text" class="search-input" id="searchInput" placeholder="Buscar recursos..." oninput="handleSearch()">
-                        </div>
+            <div class="toolbar">
+                <div class="search-box">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Buscar recursos..." oninput="handleSearch()">
+                </div>
 
-                        <div class="custom-select" id="filterTipoDropdown">
-                            <div class="custom-select-trigger" onclick="toggleDropdown('filterTipoDropdown')">
-                                <span>Todos los tipos</span>
-                                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M6 9l6 6 6-6"/>
-                                </svg>
-                            </div>
-                            <div class="custom-select-options">
-                                <div class="custom-select-option selected" data-value="" onclick="selectOption('filterTipoDropdown', '', 'Todos los tipos')">Todos los tipos</div>
-                                <div class="custom-select-option" data-value="video" onclick="selectOption('filterTipoDropdown', 'video', 'Videos')">Videos</div>
-                                <div class="custom-select-option" data-value="pdf" onclick="selectOption('filterTipoDropdown', 'pdf', 'PDFs')">PDFs</div>
-                                <div class="custom-select-option" data-value="articulo" onclick="selectOption('filterTipoDropdown', 'articulo', 'Artículos')">Artículos</div>
-                            </div>
-                            <select class="filter-select" id="filterTipo">
-                                <option value="">Todos los tipos</option>
-                                <option value="video">Videos</option>
-                                <option value="pdf">PDFs</option>
-                                <option value="articulo">Artículos</option>
-                            </select>
-                        </div>
+                <div class="custom-select" id="filterTipoDropdown">
+                    <div class="custom-select-trigger" onclick="toggleDropdown('filterTipoDropdown')">
+                        <span>Todos los tipos</span>
+                        <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </div>
+                    <div class="custom-select-options">
+                        <div class="custom-select-option selected" data-value="" onclick="selectOption('filterTipoDropdown', '', 'Todos los tipos')">Todos los tipos</div>
+                        <div class="custom-select-option" data-value="video" onclick="selectOption('filterTipoDropdown', 'video', 'Videos')">Videos</div>
+                        <div class="custom-select-option" data-value="pdf" onclick="selectOption('filterTipoDropdown', 'pdf', 'PDFs')">PDFs</div>
+                        <div class="custom-select-option" data-value="articulo" onclick="selectOption('filterTipoDropdown', 'articulo', 'Artículos')">Artículos</div>
+                    </div>
+                    <select class="filter-select" id="filterTipo">
+                        <option value="">Todos los tipos</option>
+                        <option value="video">Videos</option>
+                        <option value="pdf">PDFs</option>
+                        <option value="articulo">Artículos</option>
+                    </select>
+                </div>
 
-                        <div class="custom-select" id="filterCategoriaDropdown">
-                            <div class="custom-select-trigger" onclick="toggleDropdown('filterCategoriaDropdown')">
-                                <span>Todas las categorías</span>
-                                <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M6 9l6 6 6-6"/>
-                                </svg>
-                            </div>
-                            <div class="custom-select-options">
-                                <div class="custom-select-option selected" data-value="" onclick="selectOption('filterCategoriaDropdown', '', 'Todas las categorías')">Todas las categorías</div>
-                                <div class="custom-select-option" data-value="comercial" onclick="selectOption('filterCategoriaDropdown', 'comercial', 'Comercial')">Comercial</div>
-                                <div class="custom-select-option" data-value="meta-ads" onclick="selectOption('filterCategoriaDropdown', 'meta-ads', 'Meta Ads')">Meta Ads</div>
-                                <div class="custom-select-option" data-value="gohighlevel" onclick="selectOption('filterCategoriaDropdown', 'gohighlevel', 'GoHighLevel')">GoHighLevel</div>
-                                <div class="custom-select-option" data-value="general" onclick="selectOption('filterCategoriaDropdown', 'general', 'General')">General</div>
-                            </div>
-                            <select class="filter-select" id="filterCategoria">
-                                <option value="">Todas las categorías</option>
-                                <option value="comercial">Comercial</option>
-                                <option value="meta-ads">Meta Ads</option>
-                                <option value="gohighlevel">GoHighLevel</option>
-                                <option value="general">General</option>
-                            </select>
-                        </div>
+                <div class="custom-select" id="filterCategoriaDropdown">
+                    <div class="custom-select-trigger" onclick="toggleDropdown('filterCategoriaDropdown')">
+                        <span>Todas las categorías</span>
+                        <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
                     </div>
+                    <div class="custom-select-options">
+                        <div class="custom-select-option selected" data-value="" onclick="selectOption('filterCategoriaDropdown', '', 'Todas las categorías')">Todas las categorías</div>
+                        <div class="custom-select-option" data-value="comercial" onclick="selectOption('filterCategoriaDropdown', 'comercial', 'Comercial')">Comercial</div>
+                        <div class="custom-select-option" data-value="meta-ads" onclick="selectOption('filterCategoriaDropdown', 'meta-ads', 'Meta Ads')">Meta Ads</div>
+                        <div class="custom-select-option" data-value="gohighlevel" onclick="selectOption('filterCategoriaDropdown', 'gohighlevel', 'GoHighLevel')">GoHighLevel</div>
+                        <div class="custom-select-option" data-value="general" onclick="selectOption('filterCategoriaDropdown', 'general', 'General')">General</div>
+                    </div>
+                    <select class="filter-select" id="filterCategoria">
+                        <option value="">Todas las categorías</option>
+                        <option value="comercial">Comercial</option>
+                        <option value="meta-ads">Meta Ads</option>
+                        <option value="gohighlevel">GoHighLevel</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+            </div>
 
-                    <div class="table-container">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Título</th>
-                                    <th>Tipo</th>
-                                    <th>Categoría</th>
-                                    <th>Estado</th>
-                                    <th>Actualizado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recursosTable">
-                                <tr>
-                                    <td colspan="6" class="empty-state">
-                                        <div class="loading loading-dark"></div>
-                                        <p style="margin-top: 1rem;">Cargando recursos...</p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="pagination" id="pagination"></div>
-                    </div>
-                </div><!-- End recursos-panel -->
-
-                <!-- Panel derecho: Usuarios -->
-                <div class="usuarios-panel">
-                    <div class="panel-header">
-                        <h3 class="panel-title">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                                <circle cx="9" cy="7" r="4"/>
-                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                            </svg>
-                            Usuarios
-                        </h3>
-                        <span class="panel-count" id="usersCount">0</span>
-                    </div>
-                    <div class="users-search">
-                        <input type="text" id="usersSearchInput" placeholder="Buscar usuarios..." oninput="filterUsers()">
-                    </div>
-                    <div class="users-list" id="usersList">
-                        <div class="users-empty">
-                            <div class="loading loading-dark"></div>
-                            <p style="margin-top: 0.75rem;">Cargando usuarios...</p>
-                        </div>
-                    </div>
-                </div><!-- End usuarios-panel -->
-            </div><!-- End recursos-layout -->
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Categoría</th>
+                            <th>Estado</th>
+                            <th>Actualizado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recursosTable">
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <div class="loading loading-dark"></div>
+                                <p style="margin-top: 1rem;">Cargando recursos...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination" id="pagination"></div>
+            </div>
         </div><!-- End recursosTab -->
+
+        <!-- Usuarios Tab Content -->
+        <div class="tab-content" id="usuariosTab">
+            <div class="users-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Gestión de Usuarios</h2>
+                        <p class="section-subtitle">Administra los usuarios del sistema</p>
+                    </div>
+                    <div class="users-stats">
+                        <span class="users-stat-item"><strong id="usersCountTotal">0</strong> usuarios</span>
+                        <span class="users-stat-item"><strong id="usersCountActive">0</strong> activos</span>
+                        <span class="users-stat-item blocked"><strong id="usersCountBlocked">0</strong> bloqueados</span>
+                    </div>
+                </div>
+                <div class="users-toolbar">
+                    <div class="search-box">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                        </svg>
+                        <input type="text" class="search-input" id="usersSearchInput" placeholder="Buscar por nombre o email..." oninput="filterUsers()">
+                    </div>
+                </div>
+                <div class="users-grid" id="usersGrid">
+                    <div class="users-loading">
+                        <div class="loading loading-dark"></div>
+                        <p style="margin-top: 0.75rem;">Cargando usuarios...</p>
+                    </div>
+                </div>
+            </div>
+        </div><!-- End usuariosTab -->
     </div>
 
     <!-- Create/Edit Modal -->
@@ -1886,6 +1903,8 @@
             // Load data for the tab
             if (tabName === 'metrics') {
                 loadFeedbackStats();
+            } else if (tabName === 'usuarios') {
+                loadUsers();
             }
         }
 
@@ -2104,9 +2123,9 @@
         let selectedUserData = null;
 
         async function loadUsers() {
-            const list = document.getElementById('usersList');
-            list.innerHTML = `
-                <div class="users-empty">
+            const grid = document.getElementById('usersGrid');
+            grid.innerHTML = `
+                <div class="users-loading">
                     <div class="loading loading-dark"></div>
                     <p style="margin-top: 0.75rem;">Cargando usuarios...</p>
                 </div>
@@ -2121,37 +2140,51 @@
 
                 if (result.success) {
                     allUsers = result.data.users;
-                    document.getElementById('usersCount').textContent = allUsers.length;
+                    const activeCount = allUsers.filter(u => u.isActive).length;
+                    const blockedCount = allUsers.filter(u => !u.isActive).length;
+                    document.getElementById('usersCountTotal').textContent = allUsers.length;
+                    document.getElementById('usersCountActive').textContent = activeCount;
+                    document.getElementById('usersCountBlocked').textContent = blockedCount;
                     renderUsers(allUsers);
                 } else {
-                    list.innerHTML = `<div class="users-empty">Error al cargar usuarios</div>`;
+                    grid.innerHTML = `<div class="users-loading">Error al cargar usuarios</div>`;
                 }
             } catch (error) {
                 console.error('Error loading users:', error);
-                list.innerHTML = `<div class="users-empty">Error de conexión</div>`;
+                grid.innerHTML = `<div class="users-loading">Error de conexión</div>`;
             }
         }
 
         function renderUsers(users) {
-            const list = document.getElementById('usersList');
+            const grid = document.getElementById('usersGrid');
 
             if (users.length === 0) {
-                list.innerHTML = `<div class="users-empty">No hay usuarios</div>`;
+                grid.innerHTML = `<div class="users-loading">No hay usuarios</div>`;
                 return;
             }
 
-            list.innerHTML = users.map(user => `
-                <div class="user-item ${!user.isActive ? 'blocked' : ''}" onclick="openUserModal('${user.id}')">
-                    <div class="user-info">
-                        <div class="user-avatar">${getInitials(user.name)}</div>
-                        <div class="user-details">
-                            <div class="user-name">${escapeHtml(user.name)}</div>
-                            <div class="user-email">${escapeHtml(user.email)}</div>
+            grid.innerHTML = users.map(user => `
+                <div class="user-card ${!user.isActive ? 'blocked' : ''}" onclick="openUserModal('${user.id}')">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div class="user-info">
+                            <div class="user-avatar">${getInitials(user.name)}</div>
+                            <div class="user-details">
+                                <div class="user-name">${escapeHtml(user.name)}</div>
+                                <div class="user-email">${escapeHtml(user.email)}</div>
+                            </div>
+                        </div>
+                        <div class="user-meta">
+                            ${user.role === 'admin' ? '<span class="user-badge admin">Admin</span>' : '<span class="user-badge user">Usuario</span>'}
+                            ${!user.isActive ? '<span class="user-badge blocked">Bloqueado</span>' : ''}
                         </div>
                     </div>
-                    <div class="user-meta">
-                        ${user.role === 'admin' ? '<span class="user-badge admin">Admin</span>' : ''}
-                        ${!user.isActive ? '<span class="user-badge blocked">Bloqueado</span>' : ''}
+                    <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">
+                            ${user.company ? escapeHtml(user.company) : 'Sin empresa'}
+                        </span>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">
+                            ${user.conversations?.length || 0} chats
+                        </span>
                     </div>
                 </div>
             `).join('');
