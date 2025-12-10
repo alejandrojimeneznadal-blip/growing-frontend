@@ -1067,6 +1067,7 @@
         let selectedCategory = null;
         let localConversations = {};
         let feedbackCounter = 0;
+        let loadedFeedbacks = {}; // Feedback cargado de la BD por messageId
 
         const welcomeMessages = [
             { title: '¡Bienvenido al Centro de Soporte!', subtitle: 'Estoy aquí para ayudarte a hacer crecer tu inmobiliaria. Selecciona un tema para comenzar o escribe tu pregunta directamente.' },
@@ -1101,10 +1102,10 @@
             container.id = feedbackId;
             container.setAttribute('data-message-id', messageId || '');
 
-            // Verificar si ya hay feedback guardado
-            var storedFeedback = getStoredFeedback(messageId);
-            if (storedFeedback && storedFeedback.resolved !== undefined) {
-                if (storedFeedback.resolved === true && storedFeedback.clearSteps !== undefined) {
+            // Verificar si ya hay feedback guardado en la BD
+            var storedFeedback = loadedFeedbacks[messageId] || null;
+            if (storedFeedback && storedFeedback.resolved !== undefined && storedFeedback.resolved !== null) {
+                if (storedFeedback.resolved === true && storedFeedback.clearSteps !== undefined && storedFeedback.clearSteps !== null) {
                     // Feedback completo positivo - mostrar gracias
                     var thanks = document.createElement('div');
                     thanks.className = 'feedback-thanks';
@@ -1419,21 +1420,7 @@
             var messageId = container.getAttribute('data-message-id') || null;
             var feedback = { conversationId: currentConversationId, messageId: messageId, timestamp: new Date().toISOString(), ...data };
 
-            // Guardar en localStorage para persistencia
-            if (messageId) {
-                var stored = JSON.parse(localStorage.getItem('feedbackData') || '{}');
-                stored[messageId] = stored[messageId] || {};
-                Object.assign(stored[messageId], data);
-                localStorage.setItem('feedbackData', JSON.stringify(stored));
-            }
-
             if (window.API && window.API.saveFeedback) window.API.saveFeedback(feedback).catch(function(err) { console.error('Error saving feedback:', err); });
-        }
-
-        function getStoredFeedback(messageId) {
-            if (!messageId) return null;
-            var stored = JSON.parse(localStorage.getItem('feedbackData') || '{}');
-            return stored[messageId] || null;
         }
 
         function scrollToBottom() {
@@ -1578,28 +1565,29 @@
             if (window.innerWidth <= 768) closeMobileMenu();
             selectedCategory = null;
             unblockChat();
-            
+            loadedFeedbacks = {}; // Limpiar feedbacks anteriores
+
             document.querySelectorAll('.chat-history-item').forEach(function(el) { el.classList.remove('active'); });
             var activeItem = document.querySelector('.chat-history-item[data-id="' + conversationId + '"]');
             if (activeItem) activeItem.classList.add('active');
-            
+
             var localConv = localConversations[conversationId];
-            
+
             if (localConv && localConv.isNew) {
                 currentConversationId = conversationId;
                 currentConversationTitle = localConv.title;
                 currentChatHasMessages = localConv.hasMessages;
-                
+
                 document.getElementById('welcomeSection').style.display = localConv.hasMessages ? 'none' : 'flex';
                 var messagesArea = document.getElementById('messagesArea');
-                
+
                 if (localConv.hasMessages) {
                     messagesArea.classList.add('active');
                     messagesArea.innerHTML = '';
                     var sorted = localConv.messages.slice().sort(function(a, b) { return new Date(a.createdAt) - new Date(b.createdAt); });
                     sorted.forEach(function(msg) {
                         var imageData = msg.imageData && msg.imageMimeType ? { data: msg.imageData, mimeType: msg.imageMimeType } : null;
-                        addMessageToUI(msg.content, msg.sender === 'user', msg.createdAt, imageData, false);
+                        addMessageToUI(msg.content, msg.sender === 'user', msg.createdAt, imageData, false, msg.id);
                     });
                 } else {
                     messagesArea.classList.remove('active');
@@ -1608,28 +1596,41 @@
                 }
                 return;
             }
-            
-            var result = await window.API.loadConversation(conversationId);
-            
+
+            // Cargar conversación y feedbacks en paralelo
+            var [result, feedbackResult] = await Promise.all([
+                window.API.loadConversation(conversationId),
+                window.API.getConversationFeedback(conversationId)
+            ]);
+
+            // Procesar feedbacks cargados
+            if (feedbackResult.success && feedbackResult.feedbacks) {
+                feedbackResult.feedbacks.forEach(function(fb) {
+                    if (fb.messageId) {
+                        loadedFeedbacks[fb.messageId] = fb;
+                    }
+                });
+            }
+
             if (result.success && result.conversation) {
                 currentConversationId = conversationId;
                 currentConversationTitle = result.conversation.title || 'Sin título';
                 currentChatHasMessages = result.conversation.messages && result.conversation.messages.length > 0;
                 window.API.setCurrentConversationId(conversationId);
-                
+
                 var msgs = (result.conversation.messages || []).slice().sort(function(a, b) { return new Date(a.createdAt) - new Date(b.createdAt); });
                 localConversations[conversationId] = { id: conversationId, title: result.conversation.title, category: result.conversation.category, messages: msgs, hasMessages: currentChatHasMessages, isNew: false };
-                
+
                 document.getElementById('welcomeSection').style.display = 'none';
                 var messagesArea = document.getElementById('messagesArea');
                 messagesArea.classList.add('active');
                 messagesArea.innerHTML = '';
-                
+
                 if (result.conversation.messages) {
                     var sorted = result.conversation.messages.slice().sort(function(a, b) { return new Date(a.createdAt) - new Date(b.createdAt); });
                     sorted.forEach(function(msg) {
                         var imageData = msg.imageData && msg.imageMimeType ? { data: msg.imageData, mimeType: msg.imageMimeType } : null;
-                        addMessageToUI(msg.content, msg.sender === 'user', msg.createdAt, imageData, false);
+                        addMessageToUI(msg.content, msg.sender === 'user', msg.createdAt, imageData, false, msg.id);
                     });
                 }
             }

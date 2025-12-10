@@ -332,6 +332,27 @@ async function saveFeedback(feedbackData) {
     }
 }
 
+async function getConversationFeedback(conversationId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/feedback/conversation/${conversationId}`, {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        const data = await response.json();
+        console.log('Get conversation feedback response:', data);
+
+        if (response.ok && data.success) {
+            return { success: true, feedbacks: data.data };
+        } else {
+            return { success: false, error: data.message || 'Error al cargar feedback' };
+        }
+    } catch (error) {
+        console.error('Get conversation feedback error:', error);
+        return { success: false, error: 'Error de conexión' };
+    }
+}
+
 async function getFeedbackStats(params = {}) {
     try {
         const query = new URLSearchParams();
@@ -651,6 +672,7 @@ window.API = {
     
     // Feedback
     saveFeedback,
+    getConversationFeedback,
     getFeedbackStats,
     
     // Admin
