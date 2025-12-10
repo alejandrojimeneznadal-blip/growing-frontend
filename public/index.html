@@ -575,6 +575,24 @@
         .settings-option { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; }
         .settings-option-label { font-size: 0.875rem; color: var(--text-primary); }
 
+        /* Search Modal */
+        .search-modal { width: 500px; max-width: 95%; }
+        .search-input-container { position: relative; margin-bottom: 1rem; }
+        .search-input-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--text-secondary); }
+        .search-input { padding-left: 40px !important; }
+        .search-results { max-height: 400px; overflow-y: auto; }
+        .search-result-item {
+            padding: 0.75rem; border-radius: 8px; cursor: pointer;
+            border: 1px solid var(--border-color); margin-bottom: 0.5rem;
+            transition: all var(--transition-fast);
+        }
+        .search-result-item:hover { background-color: var(--light-blue-bg); border-color: var(--primary-blue); }
+        .search-result-title { font-weight: 500; color: var(--text-primary); margin-bottom: 0.25rem; }
+        .search-result-preview { font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .search-result-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; font-size: 0.7rem; color: var(--text-secondary); }
+        .search-no-results { text-align: center; color: var(--text-secondary); padding: 2rem; }
+        .search-loading { text-align: center; color: var(--text-secondary); padding: 1rem; }
+
         .mobile-menu-btn {
             display: none; position: fixed; top: 1rem; left: 1rem;
             z-index: 100000; width: 40px; height: 40px;
@@ -878,7 +896,7 @@
                     </div>
                 </div>
                 <div class="header-actions">
-                    <button class="header-btn" title="Buscar">
+                    <button class="header-btn" title="Buscar" onclick="openSearchModal()">
                         <svg class="icon" viewBox="0 0 24 24" stroke="currentColor" fill="none"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     </button>
                     <div class="dropdown-container">
@@ -1047,6 +1065,23 @@
             <div class="modal-footer">
                 <button class="btn-secondary" onclick="closeChangePasswordModal()">Cancelar</button>
                 <button class="btn-primary" style="width: auto;" onclick="changePassword()">Cambiar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="modal-overlay" id="searchModal">
+        <div class="modal search-modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Buscar conversaciones</h3>
+                <button class="modal-close" onclick="closeSearchModal()"><svg class="icon" viewBox="0 0 24 24" stroke="currentColor" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
+            <div class="modal-body">
+                <div class="search-input-container">
+                    <svg class="search-input-icon" viewBox="0 0 24 24" stroke="currentColor" fill="none"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    <input type="text" id="searchInput" class="form-input search-input" placeholder="Buscar por título o contenido..." oninput="handleSearchInput(event)">
+                </div>
+                <div id="searchResults" class="search-results"></div>
             </div>
         </div>
     </div>
@@ -2121,6 +2156,62 @@
             document.getElementById('settingsModal').classList.add('active');
         }
         function closeSettings() { document.getElementById('settingsModal').classList.remove('active'); }
+
+        // Search functions
+        var searchTimeout = null;
+        function openSearchModal() {
+            document.getElementById('searchModal').classList.add('active');
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchResults').innerHTML = '<div class="search-no-results">Escribe para buscar conversaciones</div>';
+            setTimeout(function() { document.getElementById('searchInput').focus(); }, 100);
+        }
+        function closeSearchModal() {
+            document.getElementById('searchModal').classList.remove('active');
+        }
+        function handleSearchInput(event) {
+            var query = event.target.value.trim();
+            if (searchTimeout) clearTimeout(searchTimeout);
+
+            if (query.length < 2) {
+                document.getElementById('searchResults').innerHTML = '<div class="search-no-results">Escribe al menos 2 caracteres</div>';
+                return;
+            }
+
+            document.getElementById('searchResults').innerHTML = '<div class="search-loading">Buscando...</div>';
+
+            searchTimeout = setTimeout(function() {
+                performSearch(query);
+            }, 300);
+        }
+        async function performSearch(query) {
+            if (!window.API || !window.API.searchConversations) {
+                document.getElementById('searchResults').innerHTML = '<div class="search-no-results">Función de búsqueda no disponible</div>';
+                return;
+            }
+
+            var result = await window.API.searchConversations(query);
+            var resultsContainer = document.getElementById('searchResults');
+
+            if (result.success && result.conversations && result.conversations.length > 0) {
+                var html = '';
+                result.conversations.forEach(function(conv) {
+                    var lastMsg = conv.messages && conv.messages.length > 0 ? conv.messages[conv.messages.length - 1].content : '';
+                    var date = new Date(conv.updatedAt).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+                    html += '<div class="search-result-item" onclick="openSearchResult(\'' + conv.id + '\')">' +
+                        '<div class="search-result-title">' + escapeHtml(conv.title || 'Sin título') + '</div>' +
+                        '<div class="search-result-preview">' + escapeHtml(lastMsg.substring(0, 100)) + '</div>' +
+                        '<div class="search-result-meta"><span>' + date + '</span><span>' + (conv.category || 'general') + '</span></div>' +
+                    '</div>';
+                });
+                resultsContainer.innerHTML = html;
+            } else {
+                resultsContainer.innerHTML = '<div class="search-no-results">No se encontraron resultados</div>';
+            }
+        }
+        function openSearchResult(conversationId) {
+            closeSearchModal();
+            openConversation(conversationId);
+        }
 
         function toggleNotifications() {
             var toggle = document.getElementById('notificationsToggle');
