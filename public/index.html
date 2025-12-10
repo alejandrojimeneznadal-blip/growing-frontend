@@ -1100,7 +1100,24 @@
             container.className = 'loom-feedback';
             container.id = feedbackId;
             container.setAttribute('data-message-id', messageId || '');
-            
+
+            // Verificar si ya hay feedback guardado
+            var storedFeedback = getStoredFeedback(messageId);
+            if (storedFeedback && storedFeedback.resolved !== undefined) {
+                if (storedFeedback.resolved === true && storedFeedback.clearSteps !== undefined) {
+                    // Feedback completo positivo - mostrar gracias
+                    var thanks = document.createElement('div');
+                    thanks.className = 'feedback-thanks';
+                    thanks.textContent = '¡Gracias por tu valoración!';
+                    container.appendChild(thanks);
+                    return container;
+                } else if (storedFeedback.resolved === false) {
+                    // Feedback negativo - mostrar panel de escalación
+                    showStoredEscalationPanel(container, feedbackId, storedFeedback);
+                    return container;
+                }
+            }
+
             var initialQuestion = document.createElement('div');
             initialQuestion.className = 'feedback-question';
             initialQuestion.id = feedbackId + '-q-initial';
@@ -1110,9 +1127,40 @@
                     '<button class="feedback-thumb thumb-down" onclick="handleFeedbackThumb(\'' + feedbackId + '\', false)" title="No"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>' +
                     '<button class="feedback-thumb thumb-up" onclick="handleFeedbackThumb(\'' + feedbackId + '\', true)" title="Sí"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>' +
                 '</div>';
-            
+
             container.appendChild(initialQuestion);
             return container;
+        }
+
+        function showStoredEscalationPanel(container, feedbackId, storedFeedback) {
+            var panel = document.createElement('div');
+            panel.className = 'escalation-panel';
+            panel.id = feedbackId + '-escalation';
+
+            var category = storedFeedback.escalatedCategory || null;
+
+            var html = '<div class="escalation-header">' +
+                '<div class="escalation-title">Lamentamos que no se haya resuelto tu consulta</div>' +
+                '<div class="escalation-subtitle">Te dejamos recursos que te pueden ayudar:</div></div>';
+
+            if (category) {
+                html += getEscalationContentHTML(category);
+            } else {
+                html += '<div class="escalation-categories"><div class="escalation-category-label">Selecciona una categoría:</div>' +
+                    '<div class="escalation-category-buttons">' +
+                        '<button class="escalation-category-btn" onclick="selectEscalationCategory(\'' + feedbackId + '\', \'comercial\')">Comercial</button>' +
+                        '<button class="escalation-category-btn" onclick="selectEscalationCategory(\'' + feedbackId + '\', \'meta-ads\')">Meta Ads</button>' +
+                        '<button class="escalation-category-btn" onclick="selectEscalationCategory(\'' + feedbackId + '\', \'gohighlevel\')">GoHighLevel</button>' +
+                    '</div></div>';
+                html += '<div class="escalation-content" style="display: none;"></div>';
+            }
+
+            if (!storedFeedback.continuedAfterEscalation) {
+                html += '<button class="escalation-continue-btn" onclick="continueChat(\'' + feedbackId + '\')" style="margin-top: 1rem;">Continuar con el chat igualmente</button>';
+            }
+
+            panel.innerHTML = html;
+            container.appendChild(panel);
         }
 
         // FIX 1: Añadir función createStarsHTML que faltaba
@@ -1368,8 +1416,24 @@
         function saveFeedback(feedbackId, data) {
             var container = document.getElementById(feedbackId);
             if (!container) return;
-            var feedback = { conversationId: currentConversationId, messageId: container.getAttribute('data-message-id') || null, timestamp: new Date().toISOString(), ...data };
+            var messageId = container.getAttribute('data-message-id') || null;
+            var feedback = { conversationId: currentConversationId, messageId: messageId, timestamp: new Date().toISOString(), ...data };
+
+            // Guardar en localStorage para persistencia
+            if (messageId) {
+                var stored = JSON.parse(localStorage.getItem('feedbackData') || '{}');
+                stored[messageId] = stored[messageId] || {};
+                Object.assign(stored[messageId], data);
+                localStorage.setItem('feedbackData', JSON.stringify(stored));
+            }
+
             if (window.API && window.API.saveFeedback) window.API.saveFeedback(feedback).catch(function(err) { console.error('Error saving feedback:', err); });
+        }
+
+        function getStoredFeedback(messageId) {
+            if (!messageId) return null;
+            var stored = JSON.parse(localStorage.getItem('feedbackData') || '{}');
+            return stored[messageId] || null;
         }
 
         function scrollToBottom() {
