@@ -630,13 +630,13 @@
         .feedback-question.hidden { display: none; }
         .feedback-question-text { font-weight: 400; }
 
-        .feedback-thumbs { display: inline-flex; align-items: center; margin-left: 0.5rem; border-radius: 10px; overflow: hidden; }
+        .feedback-thumbs { display: inline-flex; align-items: center; margin-left: 0.5rem; border-radius: 8px; overflow: hidden; }
         .feedback-thumb {
-            width: 44px; height: 36px; border: none;
+            width: 32px; height: 26px; border: none;
             cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
             transition: all var(--transition-fast); padding: 0;
         }
-        .feedback-thumb svg { width: 18px; height: 18px; transition: transform var(--transition-fast); }
+        .feedback-thumb svg { width: 14px; height: 14px; transition: transform var(--transition-fast); }
         .feedback-thumb.thumb-down { background: #FEE2E2; }
         .feedback-thumb.thumb-down svg { stroke: #DC2626; }
         .feedback-thumb.thumb-up { background: #D1FAE5; }
@@ -1183,11 +1183,11 @@
             var question = document.createElement('div');
             question.className = 'feedback-question';
             question.id = feedbackId + '-q-clearsteps';
-            question.innerHTML = 
+            question.innerHTML =
                 '<span class="feedback-question-text">¿Pasos claros para resolver?</span>' +
-                '<div class="feedback-yesno">' +
-                    '<button class="feedback-yesno-btn" onclick="handleClearSteps(\'' + feedbackId + '\', true)">Sí</button>' +
-                    '<button class="feedback-yesno-btn" onclick="handleClearSteps(\'' + feedbackId + '\', false)">No</button>' +
+                '<div class="feedback-thumbs">' +
+                    '<button class="feedback-thumb thumb-down" onclick="handleClearSteps(\'' + feedbackId + '\', false)" title="No"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>' +
+                    '<button class="feedback-thumb thumb-up" onclick="handleClearSteps(\'' + feedbackId + '\', true)" title="Sí"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>' +
                 '</div>';
             
             container.appendChild(question);
@@ -1229,10 +1229,15 @@
         function handleClearSteps(feedbackId, clearSteps) {
             var container = document.getElementById(feedbackId);
             if (!container) return;
-            
-            var buttons = container.querySelectorAll('.feedback-yesno-btn');
-            buttons.forEach(function(btn) { btn.disabled = true; btn.style.cursor = 'default'; });
-            buttons[clearSteps ? 0 : 1].classList.add('selected');
+
+            var currentQuestion = document.getElementById(feedbackId + '-q-clearsteps');
+            var thumbs = currentQuestion.querySelectorAll('.feedback-thumb');
+            thumbs.forEach(function(thumb) {
+                thumb.disabled = true;
+                thumb.style.cursor = 'default';
+                thumb.style.pointerEvents = 'none';
+            });
+            thumbs[clearSteps ? 1 : 0].classList.add('selected');
             
             saveFeedback(feedbackId, { clearSteps: clearSteps });
             
