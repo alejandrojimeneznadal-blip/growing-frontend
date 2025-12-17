@@ -1024,6 +1024,11 @@
                             <h3 class="category-title">GoHighLevel</h3>
                             <p class="category-description">CRM y automatización</p>
                         </div>
+                        <div class="category-card" onclick="selectCategory('direccion')">
+                            <div class="category-icon"><svg class="icon" viewBox="0 0 24 24" stroke="white" fill="none"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></div>
+                            <h3 class="category-title">Dirección</h3>
+                            <p class="category-description">Liderazgo y gestión</p>
+                        </div>
                     </div>
                 </div>
 
@@ -2017,7 +2022,8 @@
                 var categoryMessages = {
                     'comercial': '¡Hola! Soy tu asistente comercial. ¿En qué puedo ayudarte con ventas o captación de propiedades?',
                     'meta-ads': '¡Hola! Soy tu experto en Meta Ads. ¿Tienes dudas sobre campañas publicitarias?',
-                    'gohighlevel': '¡Hola! Estoy aquí para ayudarte con GoHighLevel. ¿Qué necesitas configurar o automatizar?'
+                    'gohighlevel': '¡Hola! Estoy aquí para ayudarte con GoHighLevel. ¿Qué necesitas configurar o automatizar?',
+                    'direccion': '¡Hola! Soy tu asistente de dirección. ¿En qué puedo ayudarte con liderazgo o gestión de tu inmobiliaria?'
                 };
                 
                 addMessageToUI(categoryMessages[category] || '¿En qué puedo ayudarte?', false, null, null, true);
