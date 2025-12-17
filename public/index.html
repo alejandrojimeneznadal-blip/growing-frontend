@@ -956,7 +956,7 @@
         <main class="main-content">
             <header class="main-header">
                 <div class="header-user">
-                    <div class="header-avatar"><img src="/images/logo-growing.png" alt="Growing"></div>
+                    <div class="header-avatar"><img id="headerLogo" src="/images/logo-growing.svg" alt="Growing"></div>
                     <div>
                         <div class="header-name">Asistente de Growing</div>
                         <div class="header-status"><span class="status-dot"></span><span>Disponible</span></div>
@@ -1593,6 +1593,8 @@
             document.body.classList.add('dark-mode');
             var toggle = document.getElementById('darkModeToggle');
             if (toggle) toggle.classList.add('active');
+            var logo = document.getElementById('headerLogo');
+            if (logo) logo.src = '/images/logo-growing-dark.png';
             darkMode = true;
             localStorage.setItem('darkMode', 'true');
         }
@@ -1600,6 +1602,8 @@
             document.body.classList.remove('dark-mode');
             var toggle = document.getElementById('darkModeToggle');
             if (toggle) toggle.classList.remove('active');
+            var logo = document.getElementById('headerLogo');
+            if (logo) logo.src = '/images/logo-growing.svg';
             darkMode = false;
             localStorage.setItem('darkMode', 'false');
         }
