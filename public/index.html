@@ -613,7 +613,7 @@
             .auth-content { width: 100%; }
             .sidebar { position: fixed; left: -100%; width: 85%; max-width: 320px; z-index: 999; transition: left 0.3s ease; }
             .sidebar.active { left: 0; }
-            .mobile-menu-btn { display: flex; }
+            .mobile-menu-btn { display: flex; position: static; }
             .category-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; max-width: 100%; padding: 0 0.5rem; }
             .category-card { padding: 1rem; border-radius: 12px; }
             .category-icon { width: 40px; height: 40px; margin-bottom: 0.5rem; }
@@ -622,7 +622,14 @@
             .category-description { font-size: 0.65rem; }
             .messages-area { padding: 1rem; }
             .message-content { max-width: 90%; }
-            /* Ocultar hamburguesa en splash y login */
+            /* Evitar zoom en iOS al enfocar input */
+            .message-input { font-size: 16px !important; }
+            .form-input { font-size: 16px !important; }
+            /* Ocultar botones de búsqueda y opciones, mostrar hamburguesa en header */
+            .header-actions > .header-btn { display: none !important; }
+            .header-actions > .dropdown-container { display: none !important; }
+            .header-actions .mobile-menu-btn { display: flex !important; }
+            /* Ocultar hamburguesa fija en splash y login */
             .splash-screen.active ~ .mobile-menu-btn { display: none !important; }
             .auth-container:not(.hidden) ~ .mobile-menu-btn { display: none !important; }
         }
@@ -824,10 +831,6 @@
         <div class="splash-text">Preparando tu experiencia...</div>
     </div>
 
-    <button id="mobileMenuBtn" class="mobile-menu-btn" onclick="toggleMobileMenu()">
-        <span></span><span></span><span></span>
-    </button>
-
     <div id="mobileOverlay" class="mobile-overlay" onclick="closeMobileMenu()"></div>
 
     <div class="auth-container" id="authContainer">
@@ -922,6 +925,9 @@
                     </div>
                 </div>
                 <div class="header-actions">
+                    <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                        <span></span><span></span><span></span>
+                    </button>
                     <button class="header-btn" title="Buscar" onclick="openSearchModal()">
                         <svg class="icon" viewBox="0 0 24 24" stroke="currentColor" fill="none"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     </button>
