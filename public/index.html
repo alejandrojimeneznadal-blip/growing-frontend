@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" id="themeColor" content="#ffffff">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Growing Inmobiliario - Centro de Soporte</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -1596,6 +1598,8 @@
             if (toggle) toggle.classList.add('active');
             var logo = document.getElementById('headerLogo');
             if (logo) logo.src = '/images/logo-growing-dark.png';
+            var themeColor = document.getElementById('themeColor');
+            if (themeColor) themeColor.setAttribute('content', '#1a1a2e');
             darkMode = true;
             localStorage.setItem('darkMode', 'true');
         }
@@ -1605,6 +1609,8 @@
             if (toggle) toggle.classList.remove('active');
             var logo = document.getElementById('headerLogo');
             if (logo) logo.src = '/images/logo-growing.svg';
+            var themeColor = document.getElementById('themeColor');
+            if (themeColor) themeColor.setAttribute('content', '#ffffff');
             darkMode = false;
             localStorage.setItem('darkMode', 'false');
         }
