@@ -614,7 +614,12 @@
             .sidebar { position: fixed; left: -280px; z-index: 999; transition: left 0.3s ease; }
             .sidebar.active { left: 0; }
             .mobile-menu-btn { display: flex; }
-            .category-grid { grid-template-columns: 1fr; }
+            .category-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; max-width: 100%; padding: 0 0.5rem; }
+            .category-card { padding: 1rem; border-radius: 12px; }
+            .category-icon { width: 40px; height: 40px; margin-bottom: 0.5rem; }
+            .category-icon svg { width: 20px; height: 20px; }
+            .category-title { font-size: 0.8rem; margin-bottom: 0.25rem; }
+            .category-description { font-size: 0.65rem; }
             .messages-area { padding: 1rem; }
             .message-content { max-width: 90%; }
             /* Ocultar hamburguesa en splash y login */
