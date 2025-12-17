@@ -317,6 +317,7 @@
         .metric-breakdown-dot.comercial { background: linear-gradient(135deg, #F59E0B, #FBBF24); }
         .metric-breakdown-dot.meta-ads { background: linear-gradient(135deg, #6366F1, #818CF8); }
         .metric-breakdown-dot.gohighlevel { background: linear-gradient(135deg, #06B6D4, #22D3EE); }
+        .metric-breakdown-dot.direccion { background: linear-gradient(135deg, #10B981, #34D399); }
         .metric-breakdown-value {
             font-size: 1.125rem; font-weight: 700; color: var(--text-primary);
             background: var(--bg-secondary); padding: 0.25rem 0.75rem; border-radius: 6px;
@@ -505,6 +506,7 @@
         .badge-comercial { background: #FEF3C7; color: #92400E; }
         .badge-meta-ads { background: #E0E7FF; color: #3730A3; }
         .badge-gohighlevel { background: #CFFAFE; color: #0E7490; }
+        .badge-direccion { background: #D1FAE5; color: #047857; }
         .badge-general { background: #F3F4F6; color: #374151; }
         .badge-pending { background: #FEF3C7; color: #92400E; }
         .badge-processing { background: #DBEAFE; color: #1E40AF; }
@@ -845,6 +847,7 @@
                     </div>
                     <div class="custom-select-options">
                         <div class="custom-select-option selected" data-value="" onclick="selectOption('filterCategoriaDropdown', '', 'Todas las categorías')">Todas las categorías</div>
+                        <div class="custom-select-option" data-value="direccion" onclick="selectOption('filterCategoriaDropdown', 'direccion', 'Dirección')">Dirección</div>
                         <div class="custom-select-option" data-value="comercial" onclick="selectOption('filterCategoriaDropdown', 'comercial', 'Comercial')">Comercial</div>
                         <div class="custom-select-option" data-value="meta-ads" onclick="selectOption('filterCategoriaDropdown', 'meta-ads', 'Meta Ads')">Meta Ads</div>
                         <div class="custom-select-option" data-value="gohighlevel" onclick="selectOption('filterCategoriaDropdown', 'gohighlevel', 'GoHighLevel')">GoHighLevel</div>
@@ -852,6 +855,7 @@
                     </div>
                     <select class="filter-select" id="filterCategoria">
                         <option value="">Todas las categorías</option>
+                        <option value="direccion">Dirección</option>
                         <option value="comercial">Comercial</option>
                         <option value="meta-ads">Meta Ads</option>
                         <option value="gohighlevel">GoHighLevel</option>
@@ -995,12 +999,14 @@
                                     </div>
                                     <div class="custom-select-options">
                                         <div class="custom-select-option selected" data-value="general" onclick="selectOption('recursoCategoriaDropdown', 'general', 'General')">General</div>
+                                        <div class="custom-select-option" data-value="direccion" onclick="selectOption('recursoCategoriaDropdown', 'direccion', 'Dirección')">Dirección</div>
                                         <div class="custom-select-option" data-value="comercial" onclick="selectOption('recursoCategoriaDropdown', 'comercial', 'Comercial')">Comercial</div>
                                         <div class="custom-select-option" data-value="meta-ads" onclick="selectOption('recursoCategoriaDropdown', 'meta-ads', 'Meta Ads')">Meta Ads</div>
                                         <div class="custom-select-option" data-value="gohighlevel" onclick="selectOption('recursoCategoriaDropdown', 'gohighlevel', 'GoHighLevel')">GoHighLevel</div>
                                     </div>
                                     <select class="form-select" id="recursoCategoria" required>
                                         <option value="general">General</option>
+                                        <option value="direccion">Dirección</option>
                                         <option value="comercial">Comercial</option>
                                         <option value="meta-ads">Meta Ads</option>
                                         <option value="gohighlevel">GoHighLevel</option>
@@ -2138,6 +2144,13 @@
                             </div>
                         </div>
                         <div class="metric-breakdown">
+                            <div class="metric-breakdown-item">
+                                <span class="metric-breakdown-label">
+                                    <span class="metric-breakdown-dot direccion"></span>
+                                    Dirección
+                                </span>
+                                <span class="metric-breakdown-value">${escalation.byCategory.direccion || 0}</span>
+                            </div>
                             <div class="metric-breakdown-item">
                                 <span class="metric-breakdown-label">
                                     <span class="metric-breakdown-dot comercial"></span>
