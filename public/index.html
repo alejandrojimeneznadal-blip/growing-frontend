@@ -617,7 +617,14 @@
             .category-grid { grid-template-columns: 1fr; }
             .messages-area { padding: 1rem; }
             .message-content { max-width: 90%; }
+            /* Ocultar hamburguesa en splash y login */
+            .splash-screen.active ~ .mobile-menu-btn { display: none !important; }
+            .auth-container:not(.hidden) ~ .mobile-menu-btn { display: none !important; }
         }
+
+        /* Ocultar hamburguesa cuando no está en la app */
+        body:has(.splash-screen.active) .mobile-menu-btn { display: none !important; }
+        body:has(.auth-container:not(.hidden)) .mobile-menu-btn { display: none !important; }
 
         .hidden { display: none !important; }
 

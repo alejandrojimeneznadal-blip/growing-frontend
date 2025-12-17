@@ -1,0 +1,2477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Base de Conocimientos | Growing Inmobiliario</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #34BCFF;
+            --dark-blue: #166A88;
+            --bright-cyan: #41F2F9;
+            --light-gray: #E8F6FA;
+            --light-blue-bg: rgba(52, 188, 255, 0.08);
+            --text-primary: #1A1A1A;
+            --text-secondary: #6B7280;
+            --border-color: rgba(52, 188, 255, 0.15);
+            --white: #FFFFFF;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F9FEFF;
+            --shadow-sm: 0 2px 4px rgba(22, 106, 136, 0.05);
+            --shadow-md: 0 4px 12px rgba(22, 106, 136, 0.08);
+            --shadow-lg: 0 8px 24px rgba(22, 106, 136, 0.12);
+        }
+
+        body.dark-mode {
+            --text-primary: #F3F4F6;
+            --text-secondary: #9CA3AF;
+            --border-color: rgba(52, 188, 255, 0.2);
+            --white: #111827;
+            --light-gray: #1F2937;
+            --light-blue-bg: rgba(52, 188, 255, 0.1);
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+        }
+
+        .header-title { font-size: 1.5rem; font-weight: 700; }
+        .header-subtitle { font-size: 0.875rem; opacity: 0.9; }
+        .header-actions { display: flex; gap: 1rem; align-items: center; }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--bright-cyan) 100%);
+            color: white;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .btn-secondary { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: var(--light-blue-bg); }
+        .btn-danger { background: var(--error); color: white; }
+        .btn-danger:hover { opacity: 0.9; }
+        .btn-ghost { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-ghost:hover { background: rgba(255,255,255,0.2); }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+        .toolbar { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center; }
+
+        .search-box { flex: 1; min-width: 250px; position: relative; }
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        .search-input:focus { outline: none; border-color: var(--primary-blue); }
+        .search-icon { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+
+        /* Custom Select/Dropdown Styles */
+        .custom-select {
+            position: relative;
+            min-width: 150px;
+        }
+
+        .custom-select-trigger {
+            padding: 0.75rem 2.5rem 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .custom-select-trigger:hover {
+            border-color: var(--primary-blue);
+            background: var(--light-blue-bg);
+        }
+
+        .custom-select.open .custom-select-trigger {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(52, 188, 255, 0.1);
+        }
+
+        .custom-select-arrow {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: var(--text-secondary);
+            transition: transform 0.2s;
+            pointer-events: none;
+        }
+
+        .custom-select.open .custom-select-arrow {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .custom-select-options {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+            max-height: 250px;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.2s ease;
+        }
+
+        .custom-select.open .custom-select-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .custom-select-option {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .custom-select-option:hover {
+            background: var(--light-blue-bg);
+        }
+
+        .custom-select-option.selected {
+            background: var(--light-blue-bg);
+            color: var(--primary-blue);
+            font-weight: 500;
+        }
+
+        .custom-select-option.selected::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+        }
+
+        .custom-select-option:first-child {
+            border-radius: 7px 7px 0 0;
+        }
+
+        .custom-select-option:last-child {
+            border-radius: 0 0 7px 7px;
+        }
+
+        /* Form select (dentro de modales) */
+        .form-select-wrapper {
+            position: relative;
+        }
+
+        .form-select-wrapper .custom-select-trigger {
+            background: var(--bg-secondary);
+            width: 100%;
+        }
+
+        /* Ocultar select nativo pero mantenerlo para accesibilidad */
+        .filter-select, .form-select {
+            display: none;
+        }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; }
+        .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--primary-blue); margin-top: 0.25rem; }
+
+        /* Metrics Dashboard Styles */
+        .metrics-section { margin-bottom: 2rem; }
+        .metrics-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        .metrics-title { font-size: 1.125rem; font-weight: 600; color: var(--text-primary); }
+        .metrics-subtitle { font-size: 0.8125rem; color: var(--text-secondary); margin-top: 0.125rem; }
+
+        /* Main metrics row - 3 big cards */
+        .metrics-row-main {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        /* Secondary metrics row - 3 smaller cards */
+        .metrics-row-secondary {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+        }
+
+        .metric-card {
+            background: var(--bg-primary); border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 1.5rem; position: relative;
+            transition: all 0.2s ease;
+        }
+        .metric-card:hover { box-shadow: var(--shadow-md); border-color: var(--primary-blue); }
+
+        .metric-card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+        .metric-label { font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); }
+        .metric-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .metric-icon svg { width: 20px; height: 20px; }
+        .metric-icon.blue { background: linear-gradient(135deg, #34BCFF 0%, #41F2F9 100%); }
+        .metric-icon.blue svg { color: white; }
+        .metric-icon.green { background: linear-gradient(135deg, #10B981 0%, #34D399 100%); }
+        .metric-icon.green svg { color: white; }
+        .metric-icon.yellow { background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%); }
+        .metric-icon.yellow svg { color: white; }
+        .metric-icon.purple { background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%); }
+        .metric-icon.purple svg { color: white; }
+        .metric-icon.red { background: linear-gradient(135deg, #EF4444 0%, #F87171 100%); }
+        .metric-icon.red svg { color: white; }
+        .metric-icon.cyan { background: linear-gradient(135deg, #06B6D4 0%, #22D3EE 100%); }
+        .metric-icon.cyan svg { color: white; }
+
+        .metric-value-row { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.75rem; }
+        .metric-value { font-size: 2.75rem; font-weight: 700; color: var(--text-primary); line-height: 1; }
+        .metric-unit { font-size: 1.25rem; font-weight: 500; color: var(--text-secondary); }
+
+        .metric-detail { font-size: 0.8125rem; color: var(--text-secondary); }
+
+        .metric-progress { margin-top: 1rem; }
+        .metric-progress-bar {
+            height: 6px; background: var(--bg-secondary); border-radius: 3px; overflow: hidden;
+        }
+        .metric-progress-fill {
+            height: 100%; border-radius: 3px; transition: width 0.6s ease;
+        }
+        .metric-progress-fill.blue { background: linear-gradient(90deg, #34BCFF, #41F2F9); }
+        .metric-progress-fill.green { background: linear-gradient(90deg, #10B981, #34D399); }
+        .metric-progress-fill.yellow { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+        .metric-progress-fill.red { background: linear-gradient(90deg, #EF4444, #F87171); }
+
+        .metric-stars { display: flex; gap: 0.375rem; margin-top: 0.25rem; }
+        .metric-star { width: 24px; height: 24px; }
+        .metric-star.filled { color: #FBBF24; }
+        .metric-star.empty { color: #E5E7EB; }
+
+        .metric-breakdown { margin-top: 1.25rem; }
+        .metric-breakdown-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.625rem 0; border-bottom: 1px solid var(--border-color);
+        }
+        .metric-breakdown-item:last-child { border-bottom: none; }
+        .metric-breakdown-label {
+            color: var(--text-primary); font-size: 0.875rem; font-weight: 500;
+            display: flex; align-items: center; gap: 0.625rem;
+        }
+        .metric-breakdown-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .metric-breakdown-dot.comercial { background: linear-gradient(135deg, #F59E0B, #FBBF24); }
+        .metric-breakdown-dot.meta-ads { background: linear-gradient(135deg, #6366F1, #818CF8); }
+        .metric-breakdown-dot.gohighlevel { background: linear-gradient(135deg, #06B6D4, #22D3EE); }
+        .metric-breakdown-value {
+            font-size: 1.125rem; font-weight: 700; color: var(--text-primary);
+            background: var(--bg-secondary); padding: 0.25rem 0.75rem; border-radius: 6px;
+        }
+
+        .metrics-loading {
+            display: flex; align-items: center; justify-content: center;
+            padding: 4rem; color: var(--text-secondary); grid-column: 1 / -1;
+        }
+
+        @media (max-width: 1024px) {
+            .metrics-row-main, .metrics-row-secondary { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .metrics-row-main, .metrics-row-secondary { grid-template-columns: 1fr; }
+        }
+
+        /* Tabs for switching views */
+        .admin-tabs {
+            display: flex; gap: 0.25rem; margin-bottom: 2rem;
+            background: var(--bg-secondary); padding: 0.375rem; border-radius: 12px;
+            width: fit-content;
+        }
+        .admin-tab {
+            padding: 0.625rem 1.25rem; border-radius: 8px;
+            font-size: 0.875rem; font-weight: 500; cursor: pointer;
+            background: transparent; border: none; color: var(--text-secondary);
+            transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .admin-tab:hover { color: var(--text-primary); }
+        .admin-tab.active {
+            background: var(--bg-primary); color: var(--primary-blue);
+            box-shadow: var(--shadow-sm);
+        }
+        .admin-tab svg { width: 18px; height: 18px; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Users section styles - Simple table layout */
+        .users-section-simple { }
+        .users-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        .section-title { font-size: 1.25rem; font-weight: 600; color: var(--text-primary); }
+        .section-subtitle { font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem; }
+        .users-count-badge {
+            font-size: 0.875rem; font-weight: 500; padding: 0.5rem 1rem;
+            background: var(--light-blue-bg); color: var(--primary-blue); border-radius: 8px;
+        }
+
+        .users-toolbar-simple {
+            display: flex; gap: 1rem; margin-bottom: 1.5rem; align-items: center;
+        }
+        .users-toolbar-simple .search-box { flex: 1; max-width: 400px; }
+
+        .users-filter-btn {
+            padding: 0.625rem 1rem; border-radius: 8px; font-size: 0.875rem; font-weight: 500;
+            border: 1px solid var(--border-color); background: var(--bg-primary);
+            color: var(--text-secondary); cursor: pointer; transition: all 0.15s;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .users-filter-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+        .users-filter-btn.active { background: rgba(239, 68, 68, 0.1); border-color: #EF4444; color: #EF4444; }
+        .users-filter-btn svg { width: 16px; height: 16px; }
+
+        .users-table-container {
+            background: var(--bg-primary); border: 1px solid var(--border-color);
+            border-radius: 12px; overflow: hidden;
+        }
+        .users-table { width: 100%; border-collapse: collapse; }
+        .users-table th, .users-table td {
+            padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color);
+        }
+        .users-table th {
+            background: var(--bg-secondary); font-size: 0.75rem; text-transform: uppercase;
+            letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 600;
+        }
+        .users-table tr:hover { background: var(--light-blue-bg); }
+        .users-table tr:last-child td { border-bottom: none; }
+
+        .users-loading, .users-empty {
+            padding: 3rem 1rem; text-align: center; color: var(--text-secondary);
+        }
+
+        .user-cell { display: flex; align-items: center; gap: 0.75rem; }
+        .user-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-blue), var(--bright-cyan));
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 600; font-size: 0.75rem; flex-shrink: 0;
+        }
+        .user-name { font-weight: 500; color: var(--text-primary); font-size: 0.875rem; }
+
+        .user-badge {
+            font-size: 0.6875rem; font-weight: 600; padding: 0.25rem 0.5rem;
+            border-radius: 4px; text-transform: uppercase; display: inline-block;
+        }
+        .user-badge.admin { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
+        .user-badge.user { background: rgba(107, 114, 128, 0.1); color: #6B7280; }
+        .user-badge.active { background: rgba(16, 185, 129, 0.1); color: #10B981; }
+        .user-badge.blocked { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
+
+        .user-actions-cell { display: flex; gap: 0.5rem; }
+        .user-action-btn {
+            padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 500;
+            border: 1px solid var(--border-color); background: var(--bg-primary);
+            color: var(--text-secondary); cursor: pointer; transition: all 0.15s;
+            display: flex; align-items: center; gap: 0.375rem;
+        }
+        .user-action-btn:hover { border-color: var(--primary-blue); color: var(--primary-blue); }
+        .user-action-btn.danger:hover { border-color: #EF4444; color: #EF4444; background: rgba(239, 68, 68, 0.05); }
+        .user-action-btn svg { width: 14px; height: 14px; }
+
+        @media (max-width: 900px) {
+            .users-table { font-size: 0.8125rem; }
+            .users-table th, .users-table td { padding: 0.75rem 0.5rem; }
+            .users-toolbar-simple { flex-direction: column; align-items: stretch; }
+            .users-toolbar-simple .search-box { max-width: none; }
+        }
+
+        /* Legacy styles kept for modal */
+        .user-profile-header {
+            padding: 1.5rem; background: linear-gradient(135deg, var(--primary-blue), var(--bright-cyan));
+            color: white; text-align: center;
+        }
+        .user-profile-avatar {
+            width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: 700; margin: 0 auto 0.75rem;
+        }
+        .user-profile-name { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .user-profile-email { font-size: 0.875rem; opacity: 0.9; }
+
+        .user-profile-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .user-stat {
+            padding: 1rem; text-align: center;
+            border-right: 1px solid var(--border-color);
+        }
+        .user-stat:last-child { border-right: none; }
+        .user-stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary-blue); }
+        .user-stat-label { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem; }
+
+        .user-profile-actions {
+            padding: 1rem 1.5rem; display: flex; gap: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .user-profile-actions .btn { flex: 1; justify-content: center; }
+
+        .user-conversations { padding: 1rem 1.5rem; max-height: 300px; overflow-y: auto; }
+        .user-conversations-title {
+            font-size: 0.875rem; font-weight: 600; color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+        .conversation-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.75rem; border-radius: 8px; cursor: pointer;
+            transition: background 0.15s; margin-bottom: 0.5rem;
+        }
+        .conversation-item:hover { background: var(--bg-secondary); }
+        .conversation-title {
+            font-size: 0.8125rem; font-weight: 500; color: var(--text-primary);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;
+        }
+        .conversation-date { font-size: 0.75rem; color: var(--text-secondary); }
+        .conversation-messages {
+            font-size: 0.75rem; color: var(--text-secondary);
+            background: var(--bg-secondary); padding: 0.125rem 0.5rem; border-radius: 4px;
+        }
+
+        .table-container { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .table th { background: var(--bg-secondary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 600; }
+        .table tr:hover { background: var(--light-blue-bg); }
+        .table tr:last-child td { border-bottom: none; }
+
+        .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }
+        .badge-video { background: #DBEAFE; color: #1E40AF; }
+        .badge-pdf { background: #FEE2E2; color: #991B1B; }
+        .badge-articulo { background: #D1FAE5; color: #065F46; }
+        .badge-comercial { background: #FEF3C7; color: #92400E; }
+        .badge-meta-ads { background: #E0E7FF; color: #3730A3; }
+        .badge-gohighlevel { background: #CFFAFE; color: #0E7490; }
+        .badge-general { background: #F3F4F6; color: #374151; }
+        .badge-pending { background: #FEF3C7; color: #92400E; }
+        .badge-processing { background: #DBEAFE; color: #1E40AF; }
+        .badge-completed { background: #D1FAE5; color: #065F46; }
+        .badge-error { background: #FEE2E2; color: #991B1B; }
+
+        .actions-cell { display: flex; gap: 0.5rem; }
+        .btn-icon {
+            width: 32px; height: 32px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary); color: var(--text-secondary);
+        }
+        .btn-icon:hover { background: var(--light-blue-bg); color: var(--primary-blue); border-color: var(--primary-blue); }
+        .btn-icon.danger:hover { background: #FEE2E2; color: var(--error); border-color: var(--error); }
+
+        .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-secondary); }
+        .empty-state-icon { width: 64px; height: 64px; margin: 0 auto 1rem; opacity: 0.5; }
+
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--bg-primary); border-radius: 16px;
+            width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;
+            border: 1px solid var(--border-color);
+        }
+        .modal-header {
+            padding: 1.5rem; border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-title { font-size: 1.25rem; font-weight: 600; }
+        .modal-close {
+            width: 32px; height: 32px; border-radius: 8px;
+            border: 1px solid var(--border-color); background: var(--bg-secondary);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            color: var(--text-primary);
+        }
+        .modal-close:hover { background: var(--error); color: white; border-color: var(--error); }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border-color); display: flex; gap: 0.75rem; justify-content: flex-end; }
+
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-primary); }
+        .form-input, .form-select, .form-textarea {
+            width: 100%; padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color); border-radius: 8px;
+            font-size: 0.875rem; background: var(--bg-secondary); color: var(--text-primary);
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary-blue); }
+        .form-textarea { min-height: 120px; resize: vertical; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+        .file-upload {
+            border: 2px dashed var(--border-color); border-radius: 8px;
+            padding: 2rem; text-align: center; cursor: pointer; transition: all 0.2s;
+        }
+        .file-upload:hover { border-color: var(--primary-blue); background: var(--light-blue-bg); }
+        .file-upload.dragover { border-color: var(--primary-blue); background: var(--light-blue-bg); }
+        .file-upload.processing { pointer-events: none; opacity: 0.7; }
+        .file-upload-icon { width: 48px; height: 48px; margin: 0 auto 1rem; color: var(--text-secondary); }
+        .file-upload-text { font-size: 0.875rem; color: var(--text-secondary); }
+        .file-upload-text strong { color: var(--primary-blue); }
+
+        .file-info { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: var(--bg-secondary); border-radius: 8px; margin-top: 1rem; }
+        .file-info-name { flex: 1; font-size: 0.875rem; color: var(--text-primary); }
+        .file-info-remove { color: var(--error); cursor: pointer; }
+
+        .loading { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s linear infinite; }
+        .loading-dark { border: 2px solid rgba(0,0,0,0.1); border-top-color: var(--primary-blue); }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .toast { position: fixed; bottom: 2rem; right: 2rem; padding: 1rem 1.5rem; border-radius: 8px; color: white; font-size: 0.875rem; font-weight: 500; z-index: 2000; animation: slideIn 0.3s ease; }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--error); }
+        .toast.info { background: var(--primary-blue); }
+        @keyframes slideIn { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .truncate { max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .pagination { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 1rem; border-top: 1px solid var(--border-color); }
+        .pagination-btn { padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary); cursor: pointer; font-size: 0.875rem; }
+        .pagination-btn:hover:not(:disabled) { background: var(--light-blue-bg); border-color: var(--primary-blue); }
+        .pagination-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination-info { font-size: 0.875rem; color: var(--text-secondary); }
+
+        .progress-bar { width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary-blue), var(--bright-cyan)); transition: width 0.3s ease; }
+        .progress-bar-fill.animated { animation: progressPulse 1.5s ease-in-out infinite; }
+        @keyframes progressPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+        /* Progress Modal Styles */
+        .progress-modal-content { text-align: center; }
+        .progress-icon { width: 64px; height: 64px; margin: 0 auto 1.5rem; color: var(--primary-blue); animation: pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .progress-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .progress-subtitle { color: var(--text-secondary); margin-bottom: 1.5rem; }
+        .progress-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.5rem 0; }
+        .progress-stat { text-align: center; }
+        .progress-stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary-blue); }
+        .progress-stat-label { font-size: 0.75rem; color: var(--text-secondary); }
+        .progress-time { font-size: 0.875rem; color: var(--text-secondary); margin-top: 1rem; }
+        .progress-complete { color: var(--success); }
+        .progress-error { color: var(--error); }
+
+        /* Help Button */
+        .help-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 20px;
+            color: white;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .help-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .help-btn-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        /* Help Modal */
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .help-modal.active { display: flex; }
+        .help-modal-content {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        .help-modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .help-modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .help-modal-body {
+            padding: 1.5rem;
+        }
+        .help-modal-body iframe {
+            width: 100%;
+            height: 450px;
+            border: none;
+            border-radius: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .header { padding: 1rem; flex-direction: column; gap: 1rem; text-align: center; }
+            .toolbar { flex-direction: column; }
+            .search-box { width: 100%; }
+            .form-row { grid-template-columns: 1fr; }
+            .table { font-size: 0.75rem; }
+            .table th, .table td { padding: 0.75rem 0.5rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .progress-stats { grid-template-columns: 1fr; }
+            .help-modal-body iframe { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div>
+                <h1 class="header-title">Panel de Administrador</h1>
+                <p class="header-subtitle">Gestiona los recursos del asistente de Growing</p>
+            </div>
+            <button class="help-btn" onclick="openHelpModal()">
+                <span>¿Cómo funciona?</span>
+                <span class="help-btn-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4"/>
+                        <path d="M12 8h.01" stroke-width="3"/>
+                    </svg>
+                </span>
+            </button>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-ghost" onclick="window.location.href='/'">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Volver al Chat
+            </button>
+            <button class="btn btn-primary" onclick="openCreateModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Nuevo Recurso
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Admin Tabs -->
+        <div class="admin-tabs">
+            <button class="admin-tab active" onclick="switchTab('metrics')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 20V10M12 20V4M6 20v-6"/>
+                </svg>
+                Métricas
+            </button>
+            <button class="admin-tab" onclick="switchTab('recursos')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                Base de Conocimientos
+            </button>
+            <button class="admin-tab" onclick="switchTab('usuarios')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                Usuarios
+            </button>
+        </div>
+
+        <!-- Metrics Tab Content -->
+        <div class="tab-content active" id="metricsTab">
+            <div class="metrics-section">
+                <div class="metrics-header">
+                    <div>
+                        <h2 class="metrics-title">Métricas de Satisfacción</h2>
+                        <p class="metrics-subtitle">Rendimiento del chatbot en tiempo real</p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="loadFeedbackStats()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 4v6h-6M1 20v-6h6"/>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                        </svg>
+                        Actualizar
+                    </button>
+                </div>
+
+                <div id="metricsContainer">
+                    <div class="metrics-row-main">
+                        <div class="metrics-loading">
+                            <div class="loading loading-dark"></div>
+                            <span style="margin-left: 0.75rem;">Cargando métricas...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recursos Tab Content -->
+        <div class="tab-content" id="recursosTab">
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Recursos</div>
+                    <div class="stat-value" id="statTotal">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Videos</div>
+                    <div class="stat-value" id="statVideos">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">PDFs</div>
+                    <div class="stat-value" id="statPDFs">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Artículos</div>
+                    <div class="stat-value" id="statArticulos">0</div>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-box">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Buscar recursos..." oninput="handleSearch()">
+                </div>
+
+                <div class="custom-select" id="filterTipoDropdown">
+                    <div class="custom-select-trigger" onclick="toggleDropdown('filterTipoDropdown')">
+                        <span>Todos los tipos</span>
+                        <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </div>
+                    <div class="custom-select-options">
+                        <div class="custom-select-option selected" data-value="" onclick="selectOption('filterTipoDropdown', '', 'Todos los tipos')">Todos los tipos</div>
+                        <div class="custom-select-option" data-value="video" onclick="selectOption('filterTipoDropdown', 'video', 'Videos')">Videos</div>
+                        <div class="custom-select-option" data-value="pdf" onclick="selectOption('filterTipoDropdown', 'pdf', 'PDFs')">PDFs</div>
+                        <div class="custom-select-option" data-value="articulo" onclick="selectOption('filterTipoDropdown', 'articulo', 'Artículos')">Artículos</div>
+                    </div>
+                    <select class="filter-select" id="filterTipo">
+                        <option value="">Todos los tipos</option>
+                        <option value="video">Videos</option>
+                        <option value="pdf">PDFs</option>
+                        <option value="articulo">Artículos</option>
+                    </select>
+                </div>
+
+                <div class="custom-select" id="filterCategoriaDropdown">
+                    <div class="custom-select-trigger" onclick="toggleDropdown('filterCategoriaDropdown')">
+                        <span>Todas las categorías</span>
+                        <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </div>
+                    <div class="custom-select-options">
+                        <div class="custom-select-option selected" data-value="" onclick="selectOption('filterCategoriaDropdown', '', 'Todas las categorías')">Todas las categorías</div>
+                        <div class="custom-select-option" data-value="comercial" onclick="selectOption('filterCategoriaDropdown', 'comercial', 'Comercial')">Comercial</div>
+                        <div class="custom-select-option" data-value="meta-ads" onclick="selectOption('filterCategoriaDropdown', 'meta-ads', 'Meta Ads')">Meta Ads</div>
+                        <div class="custom-select-option" data-value="gohighlevel" onclick="selectOption('filterCategoriaDropdown', 'gohighlevel', 'GoHighLevel')">GoHighLevel</div>
+                        <div class="custom-select-option" data-value="general" onclick="selectOption('filterCategoriaDropdown', 'general', 'General')">General</div>
+                    </div>
+                    <select class="filter-select" id="filterCategoria">
+                        <option value="">Todas las categorías</option>
+                        <option value="comercial">Comercial</option>
+                        <option value="meta-ads">Meta Ads</option>
+                        <option value="gohighlevel">GoHighLevel</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Categoría</th>
+                            <th>Estado</th>
+                            <th>Actualizado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recursosTable">
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                <div class="loading loading-dark"></div>
+                                <p style="margin-top: 1rem;">Cargando recursos...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div><!-- End recursosTab -->
+
+        <!-- Usuarios Tab Content -->
+        <div class="tab-content" id="usuariosTab">
+            <div class="users-section-simple">
+                <div class="users-header">
+                    <div>
+                        <h2 class="section-title">Gestión de Usuarios</h2>
+                        <p class="section-subtitle">Administra los usuarios del sistema</p>
+                    </div>
+                    <span class="users-count-badge" id="usersCountBadge">0 usuarios</span>
+                </div>
+                <div class="users-toolbar-simple">
+                    <div class="search-box">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                        </svg>
+                        <input type="text" class="search-input" id="usersSearchInput" placeholder="Buscar por nombre, email o empresa..." oninput="filterUsers()">
+                    </div>
+                    <button class="users-filter-btn" id="adminFilterBtn" onclick="toggleAdminFilter()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+                        </svg>
+                        Solo admins
+                    </button>
+                    <button class="users-filter-btn" id="blockedFilterBtn" onclick="toggleBlockedFilter()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                        </svg>
+                        Solo bloqueados
+                    </button>
+                </div>
+                <div class="users-table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Empresa</th>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th>Registro</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr>
+                                <td colspan="7" class="users-loading">
+                                    <div class="loading loading-dark"></div>
+                                    <p style="margin-top: 0.75rem;">Cargando usuarios...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div><!-- End usuariosTab -->
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div class="modal" id="recursoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Nuevo Recurso</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="recursoForm">
+                    <input type="hidden" id="recursoId">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Tipo *</label>
+                            <div class="form-select-wrapper">
+                                <div class="custom-select" id="recursoTipoDropdown">
+                                    <div class="custom-select-trigger" onclick="toggleDropdown('recursoTipoDropdown')">
+                                        <span>Video (Loom)</span>
+                                        <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M6 9l6 6 6-6"/>
+                                        </svg>
+                                    </div>
+                                    <div class="custom-select-options">
+                                        <div class="custom-select-option selected" data-value="video" onclick="selectOption('recursoTipoDropdown', 'video', 'Video (Loom)', true)">Video (Loom)</div>
+                                        <div class="custom-select-option" data-value="pdf" onclick="selectOption('recursoTipoDropdown', 'pdf', 'PDF', true)">PDF</div>
+                                        <div class="custom-select-option" data-value="articulo" onclick="selectOption('recursoTipoDropdown', 'articulo', 'Artículo', true)">Artículo</div>
+                                    </div>
+                                    <select class="form-select" id="recursoTipo" required>
+                                        <option value="video">Video (Loom)</option>
+                                        <option value="pdf">PDF</option>
+                                        <option value="articulo">Artículo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Categoría *</label>
+                            <div class="form-select-wrapper">
+                                <div class="custom-select" id="recursoCategoriaDropdown">
+                                    <div class="custom-select-trigger" onclick="toggleDropdown('recursoCategoriaDropdown')">
+                                        <span>General</span>
+                                        <svg class="custom-select-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M6 9l6 6 6-6"/>
+                                        </svg>
+                                    </div>
+                                    <div class="custom-select-options">
+                                        <div class="custom-select-option selected" data-value="general" onclick="selectOption('recursoCategoriaDropdown', 'general', 'General')">General</div>
+                                        <div class="custom-select-option" data-value="comercial" onclick="selectOption('recursoCategoriaDropdown', 'comercial', 'Comercial')">Comercial</div>
+                                        <div class="custom-select-option" data-value="meta-ads" onclick="selectOption('recursoCategoriaDropdown', 'meta-ads', 'Meta Ads')">Meta Ads</div>
+                                        <div class="custom-select-option" data-value="gohighlevel" onclick="selectOption('recursoCategoriaDropdown', 'gohighlevel', 'GoHighLevel')">GoHighLevel</div>
+                                    </div>
+                                    <select class="form-select" id="recursoCategoria" required>
+                                        <option value="general">General</option>
+                                        <option value="comercial">Comercial</option>
+                                        <option value="meta-ads">Meta Ads</option>
+                                        <option value="gohighlevel">GoHighLevel</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Título *</label>
+                        <input type="text" class="form-input" id="recursoTitulo" required placeholder="Ej: Cómo crear un pipeline en GoHighLevel">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-textarea" id="recursoDescripcion" placeholder="Breve descripción del contenido..."></textarea>
+                    </div>
+
+                    <div class="form-group" id="urlGroup">
+                        <label class="form-label">URL del Video (Loom)</label>
+                        <input type="url" class="form-input" id="recursoUrl" placeholder="https://www.loom.com/share/...">
+                    </div>
+
+                    <div class="form-group" id="pdfUploadGroup" style="display: none;">
+                        <label class="form-label">Subir PDF</label>
+                        <div class="file-upload" id="fileUpload" onclick="document.getElementById('pdfInput').click()">
+                            <svg class="file-upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <p class="file-upload-text"><strong>Haz clic para subir</strong> o arrastra el archivo aquí</p>
+                            <p class="file-upload-text" style="font-size: 0.75rem; margin-top: 0.5rem;">PDF (máx. 50MB)</p>
+                        </div>
+                        <input type="file" id="pdfInput" accept=".pdf" style="display: none;" onchange="handlePDFSelect(event)">
+                        <div class="file-info" id="fileInfo" style="display: none;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <span class="file-info-name" id="fileName"></span>
+                            <svg class="file-info-remove" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="removePDF()">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                            </svg>
+                        </div>
+                        <div id="pdfProgress" style="display: none;">
+                            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                <span id="pdfProgressText">Extrayendo texto...</span>
+                            </p>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" id="pdfProgressBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Contenido / Texto</label>
+                        <textarea class="form-textarea" id="recursoContenido" placeholder="Contenido del artículo o transcripción del video..." style="min-height: 150px;"></textarea>
+                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                            Este texto se usará para generar el embedding y permitir búsquedas semánticas.
+                        </p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-primary" id="saveBtn" onclick="saveRecurso()">
+                    <span id="saveBtnText">Guardar</span>
+                    <span id="saveBtnLoading" class="loading" style="display: none;"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div class="modal user-detail-modal" id="userModal">
+        <div class="modal-content" style="max-width: 480px;">
+            <div class="modal-header" style="border-bottom: none; padding: 0.75rem 1rem;">
+                <span></span>
+                <button class="modal-close" onclick="closeUserModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="user-profile-header">
+                    <div class="user-profile-avatar" id="userModalAvatar">A</div>
+                    <div class="user-profile-name" id="userModalName">Usuario</div>
+                    <div class="user-profile-email" id="userModalEmail">email@example.com</div>
+                </div>
+                <div class="user-profile-stats">
+                    <div class="user-stat">
+                        <div class="user-stat-value" id="userModalChats">0</div>
+                        <div class="user-stat-label">Conversaciones</div>
+                    </div>
+                    <div class="user-stat">
+                        <div class="user-stat-value" id="userModalMessages">0</div>
+                        <div class="user-stat-label">Mensajes</div>
+                    </div>
+                    <div class="user-stat">
+                        <div class="user-stat-value" id="userModalDays">0</div>
+                        <div class="user-stat-label">Días activo</div>
+                    </div>
+                </div>
+                <div class="user-profile-actions">
+                    <button class="btn btn-secondary" id="userBlockBtn" onclick="toggleUserBlock()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+                        </svg>
+                        <span>Bloquear</span>
+                    </button>
+                    <button class="btn btn-danger" onclick="confirmDeleteUser()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                        <span>Eliminar</span>
+                    </button>
+                </div>
+                <div class="user-conversations">
+                    <div class="user-conversations-title">Conversaciones recientes</div>
+                    <div id="userConversationsList">
+                        <div class="users-empty" style="padding: 1rem;">Sin conversaciones</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Block User Confirmation Modal -->
+    <div class="modal" id="blockUserModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="blockModalTitle">Bloquear Usuario</h3>
+                <button class="modal-close" onclick="closeBlockUserModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="blockModalText" style="color: var(--text-secondary);">¿Estás seguro de que deseas bloquear este usuario? No podrá acceder al sistema ni crear nuevas cuentas con el mismo email o IP.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeBlockUserModal()">Cancelar</button>
+                <button class="btn btn-danger" id="blockModalBtn" onclick="executeBlockUser()">Bloquear Usuario</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete User Confirmation Modal -->
+    <div class="modal" id="deleteUserModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Eliminar Usuario</h3>
+                <button class="modal-close" onclick="closeDeleteUserModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-secondary);">¿Estás seguro de que deseas eliminar este usuario? Se eliminarán todas sus conversaciones y datos. Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteUserModal()">Cancelar</button>
+                <button class="btn btn-danger" onclick="executeDeleteUser()">Eliminar Usuario</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Eliminar Recurso</h3>
+                <button class="modal-close" onclick="closeDeleteModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-secondary);">¿Estás seguro de que deseas eliminar este recurso? Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn" onclick="confirmDelete()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Progress Modal -->
+    <div class="modal" id="progressModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+                <span></span>
+                <button class="modal-close" onclick="closeProgressModal()" title="Cerrar (el proceso continuará)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body progress-modal-content" style="padding-top: 0;">
+                <svg class="progress-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 6v6l4 2"/>
+                </svg>
+                <h3 class="progress-title" id="progressTitle">Generando embeddings...</h3>
+                <p class="progress-subtitle" id="progressSubtitle">Esto puede tardar unos minutos para documentos grandes</p>
+                
+                <div class="progress-bar" style="margin: 1.5rem 0;">
+                    <div class="progress-bar-fill animated" id="embeddingProgressBar" style="width: 0%"></div>
+                </div>
+                
+                <div class="progress-stats">
+                    <div class="progress-stat">
+                        <div class="progress-stat-value" id="progressCompleted">0</div>
+                        <div class="progress-stat-label">Completados</div>
+                    </div>
+                    <div class="progress-stat">
+                        <div class="progress-stat-value" id="progressTotal">0</div>
+                        <div class="progress-stat-label">Total chunks</div>
+                    </div>
+                    <div class="progress-stat">
+                        <div class="progress-stat-value" id="progressPercent">0%</div>
+                        <div class="progress-stat-label">Progreso</div>
+                    </div>
+                </div>
+                
+                <p class="progress-time" id="progressTime">Tiempo estimado: calculando...</p>
+            </div>
+            <div class="modal-footer" style="justify-content: center; border-top: none;">
+                <button class="btn btn-primary" id="progressCloseBtn" onclick="closeProgressModal()" style="display: none;">Cerrar</button>
+                <p id="progressNote" style="font-size: 0.75rem; color: var(--text-secondary); text-align: center;">
+                    Puedes cerrar esta ventana. El proceso continuará en segundo plano.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="help-modal" id="helpModal">
+        <div class="help-modal-content">
+            <div class="help-modal-header">
+                <h3 class="help-modal-title">¿Cómo funciona la Base de Conocimientos?</h3>
+                <button class="modal-close" onclick="closeHelpModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="help-modal-body">
+                <iframe src="https://www.loom.com/embed/1bd16cd2d6744b6e8cea6a20d041de11" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/api-client.js"></script>
+    <script>
+        // Initialize PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // API URL - usa la de api-client.js si existe, sino fallback
+        const _API_URL = (typeof API_BASE_URL !== 'undefined') 
+            ? API_BASE_URL 
+            : 'https://api.soporte.growinginmobiliario.com/api';
+
+        // State
+        let recursos = [];
+        let filteredRecursos = [];
+        let currentPage = 1;
+        let totalPages = 1;
+        let editingId = null;
+        let deleteId = null;
+        let uploadedPDFText = null;
+        let isProcessingPDF = false;
+        let progressPollingInterval = null;
+        let currentProcessingId = null;
+
+        // Check auth on load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!window.API || !window.API.isAuthenticated()) {
+                window.location.href = '/';
+                return;
+            }
+            
+            if (!window.API.isAdmin()) {
+                alert('Acceso denegado. Solo administradores.');
+                window.location.href = '/';
+                return;
+            }
+
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+
+            loadFeedbackStats(); // Load metrics on startup (default tab)
+            loadRecursos();
+            loadUsers();
+            setupDragDrop();
+            
+            // Cerrar dropdowns al hacer clic fuera
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.custom-select')) {
+                    document.querySelectorAll('.custom-select.open').forEach(el => {
+                        el.classList.remove('open');
+                    });
+                }
+            });
+        });
+
+        // Help Modal Functions
+        function openHelpModal() {
+            document.getElementById('helpModal').classList.add('active');
+        }
+
+        function closeHelpModal() {
+            document.getElementById('helpModal').classList.remove('active');
+        }
+
+        // Custom Dropdown Functions
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            const wasOpen = dropdown.classList.contains('open');
+            
+            // Cerrar todos los dropdowns
+            document.querySelectorAll('.custom-select.open').forEach(el => {
+                el.classList.remove('open');
+            });
+            
+            // Abrir este si estaba cerrado
+            if (!wasOpen) {
+                dropdown.classList.add('open');
+            }
+        }
+
+        function selectOption(dropdownId, value, label, triggerTipoChange = false) {
+            const dropdown = document.getElementById(dropdownId);
+            const trigger = dropdown.querySelector('.custom-select-trigger span');
+            const hiddenSelect = dropdown.querySelector('select');
+            const options = dropdown.querySelectorAll('.custom-select-option');
+            
+            // Actualizar texto del trigger
+            trigger.textContent = label;
+            
+            // Actualizar select oculto
+            if (hiddenSelect) {
+                hiddenSelect.value = value;
+            }
+            
+            // Marcar opción seleccionada
+            options.forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.value === value) {
+                    opt.classList.add('selected');
+                }
+            });
+            
+            // Cerrar dropdown
+            dropdown.classList.remove('open');
+            
+            // Trigger eventos según el dropdown
+            if (dropdownId === 'filterTipoDropdown' || dropdownId === 'filterCategoriaDropdown') {
+                currentPage = 1;
+                loadRecursos(); // Recargar del servidor con nuevos filtros
+            }
+            
+            if (triggerTipoChange && dropdownId === 'recursoTipoDropdown') {
+                handleTipoChange();
+            }
+        }
+
+        function setDropdownValue(dropdownId, value) {
+            const dropdown = document.getElementById(dropdownId);
+            if (!dropdown) return;
+            
+            const options = dropdown.querySelectorAll('.custom-select-option');
+            const trigger = dropdown.querySelector('.custom-select-trigger span');
+            const hiddenSelect = dropdown.querySelector('select');
+            
+            options.forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.value === value) {
+                    opt.classList.add('selected');
+                    trigger.textContent = opt.textContent;
+                }
+            });
+            
+            if (hiddenSelect) {
+                hiddenSelect.value = value;
+            }
+        }
+
+        async function loadRecursos() {
+            const tipo = document.getElementById('filterTipo').value;
+            const categoria = document.getElementById('filterCategoria').value;
+            
+            const result = await window.API.loadRecursos({
+                tipo,
+                categoria,
+                page: currentPage,
+                limit: 100 // Cargar más para filtrado local
+            });
+
+            if (result.success) {
+                recursos = result.recursos || [];
+                applySearchFilter();
+                
+                if (result.pagination) {
+                    totalPages = result.pagination.totalPages || 1;
+                }
+                
+                updateStats();
+                renderTable();
+                renderPagination();
+            } else {
+                showToast(result.error, 'error');
+            }
+        }
+
+        function applySearchFilter() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (!searchTerm) {
+                filteredRecursos = recursos;
+                return;
+            }
+            
+            filteredRecursos = recursos.filter(r => {
+                const titulo = (r.titulo || '').toLowerCase();
+                const descripcion = (r.descripcion || '').toLowerCase();
+                const categoria = (r.categoria || '').toLowerCase();
+                
+                return titulo.includes(searchTerm) || 
+                       descripcion.includes(searchTerm) || 
+                       categoria.includes(searchTerm);
+            });
+        }
+
+        function filterRecursos() {
+            applySearchFilter();
+            updateStats();
+            renderTable();
+        }
+
+        // Debounce para el buscador (evitar muchas llamadas)
+        let searchTimeout;
+        function handleSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                filterRecursos();
+            }, 300);
+        }
+
+        function updateStats() {
+            const total = recursos.length;
+            const videos = recursos.filter(r => r.tipo === 'video').length;
+            const pdfs = recursos.filter(r => r.tipo === 'pdf').length;
+            const articulos = recursos.filter(r => r.tipo === 'articulo').length;
+
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statVideos').textContent = videos;
+            document.getElementById('statPDFs').textContent = pdfs;
+            document.getElementById('statArticulos').textContent = articulos;
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('recursosTable');
+            
+            if (filteredRecursos.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <p>No hay recursos disponibles</p>
+                            <button class="btn btn-primary" style="margin-top: 1rem;" onclick="openCreateModal()">Crear primer recurso</button>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filteredRecursos.map(r => `
+                <tr>
+                    <td><div class="truncate" title="${escapeHtml(r.titulo)}">${escapeHtml(r.titulo)}</div></td>
+                    <td><span class="badge badge-${r.tipo}">${r.tipo}</span></td>
+                    <td><span class="badge badge-${r.categoria}">${r.categoria}</span></td>
+                    <td>
+                        <span class="badge badge-${r.embeddingStatus}" ${r.embeddingStatus === 'processing' ? 'style="cursor:pointer" onclick="showProgressForResource(\'' + r.id + '\')"' : ''}>
+                            ${r.embeddingStatus}${r.embeddingStatus === 'processing' ? ' ...' : ''}
+                        </span>
+                    </td>
+                    <td>${formatDate(r.updatedAt)}</td>
+                    <td>
+                        <div class="actions-cell">
+                            <button class="btn-icon" title="Editar" onclick="editRecurso('${r.id}')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                            </button>
+                            <button class="btn-icon danger" title="Eliminar" onclick="openDeleteModal('${r.id}')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPagination() {
+            const container = document.getElementById('pagination');
+            if (totalPages <= 1) { container.innerHTML = ''; return; }
+            container.innerHTML = `
+                <button class="pagination-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Anterior</button>
+                <span class="pagination-info">Página ${currentPage} de ${totalPages}</span>
+                <button class="pagination-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Siguiente</button>
+            `;
+        }
+
+        function goToPage(page) {
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            loadRecursos();
+        }
+
+        // Modal functions
+        function openCreateModal() {
+            editingId = null;
+            uploadedPDFText = null;
+            document.getElementById('modalTitle').textContent = 'Nuevo Recurso';
+            document.getElementById('recursoForm').reset();
+            document.getElementById('recursoId').value = '';
+            document.getElementById('fileInfo').style.display = 'none';
+            document.getElementById('pdfProgress').style.display = 'none';
+            
+            // Reset custom dropdowns
+            setDropdownValue('recursoTipoDropdown', 'video');
+            setDropdownValue('recursoCategoriaDropdown', 'general');
+            
+            handleTipoChange();
+            document.getElementById('recursoModal').classList.add('active');
+        }
+
+        async function editRecurso(id) {
+            editingId = id;
+            uploadedPDFText = null;
+            document.getElementById('modalTitle').textContent = 'Editar Recurso';
+            
+            const result = await window.API.getRecurso(id);
+            
+            if (result.success) {
+                const r = result.recurso;
+                document.getElementById('recursoId').value = r.id;
+                document.getElementById('recursoTipo').value = r.tipo;
+                document.getElementById('recursoCategoria').value = r.categoria;
+                document.getElementById('recursoTitulo').value = r.titulo;
+                document.getElementById('recursoDescripcion').value = r.descripcion || '';
+                document.getElementById('recursoUrl').value = r.url || '';
+                document.getElementById('recursoContenido').value = r.contenido || '';
+                document.getElementById('fileInfo').style.display = 'none';
+                document.getElementById('pdfProgress').style.display = 'none';
+                
+                // Update custom dropdowns
+                setDropdownValue('recursoTipoDropdown', r.tipo);
+                setDropdownValue('recursoCategoriaDropdown', r.categoria);
+                
+                handleTipoChange();
+                document.getElementById('recursoModal').classList.add('active');
+            } else {
+                showToast(result.error, 'error');
+            }
+        }
+
+        function closeModal() {
+            if (isProcessingPDF && !confirm('Se está procesando un PDF. ¿Seguro que quieres cancelar?')) return;
+            document.getElementById('recursoModal').classList.remove('active');
+            editingId = null;
+            uploadedPDFText = null;
+            isProcessingPDF = false;
+        }
+
+        function handleTipoChange() {
+            const tipo = document.getElementById('recursoTipo').value;
+            document.getElementById('urlGroup').style.display = tipo === 'video' ? 'block' : 'none';
+            document.getElementById('pdfUploadGroup').style.display = tipo === 'pdf' ? 'block' : 'none';
+        }
+
+        async function saveRecurso() {
+            if (isProcessingPDF) {
+                showToast('Espera a que termine de procesar el PDF', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('saveBtn');
+            const btnText = document.getElementById('saveBtnText');
+            const btnLoading = document.getElementById('saveBtnLoading');
+            
+            const data = {
+                tipo: document.getElementById('recursoTipo').value,
+                categoria: document.getElementById('recursoCategoria').value,
+                titulo: document.getElementById('recursoTitulo').value.trim(),
+                descripcion: document.getElementById('recursoDescripcion').value.trim(),
+                url: document.getElementById('recursoUrl').value.trim() || null,
+                contenido: uploadedPDFText || document.getElementById('recursoContenido').value.trim()
+            };
+
+            if (!data.titulo) {
+                showToast('El título es obligatorio', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline-block';
+
+            let result;
+            if (editingId) {
+                result = await window.API.updateRecurso(editingId, data);
+            } else {
+                result = await window.API.createRecurso(data);
+            }
+
+            btn.disabled = false;
+            btnText.style.display = 'inline';
+            btnLoading.style.display = 'none';
+
+            if (result.success) {
+                showToast(editingId ? 'Recurso actualizado' : 'Recurso creado', 'success');
+                closeModal();
+                loadRecursos();
+                
+                // Si hay contenido y se van a generar embeddings, mostrar progreso
+                const resourceData = result.data || result.recurso;
+                if (resourceData && (resourceData.estimatedChunks > 0 || data.contenido)) {
+                    const resourceId = resourceData.id;
+                    const estimatedChunks = resourceData.estimatedChunks || 0;
+                    console.log('Opening progress for:', resourceId, 'estimated:', estimatedChunks);
+                    setTimeout(() => showProgressForResource(resourceId, estimatedChunks), 500);
+                }
+            } else {
+                showToast(result.error, 'error');
+            }
+        }
+
+        // Progress Modal Functions
+        let expectedTotalChunks = 0; // Guardamos el total esperado
+
+        function showProgressForResource(resourceId, estimatedChunks = 0) {
+            currentProcessingId = resourceId;
+            expectedTotalChunks = estimatedChunks;
+            
+            // Reset UI
+            document.getElementById('progressModal').classList.add('active');
+            document.getElementById('progressCloseBtn').style.display = 'none';
+            document.getElementById('progressNote').style.display = 'block';
+            document.getElementById('progressTitle').textContent = 'Generando embeddings...';
+            document.getElementById('progressTitle').className = 'progress-title';
+            document.getElementById('embeddingProgressBar').classList.add('animated');
+            document.getElementById('embeddingProgressBar').style.width = '0%';
+            document.getElementById('progressCompleted').textContent = '0';
+            document.getElementById('progressTotal').textContent = estimatedChunks || '...';
+            document.getElementById('progressPercent').textContent = '0%';
+            document.getElementById('progressTime').textContent = 'Calculando...';
+            
+            startProgressPolling(resourceId);
+        }
+
+        function startProgressPolling(resourceId) {
+            if (progressPollingInterval) {
+                clearInterval(progressPollingInterval);
+            }
+
+            const poll = async () => {
+                try {
+                    const token = localStorage.getItem('authToken');
+                    const response = await fetch(`${_API_URL}/recursos/${resourceId}/status`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const result = await response.json();
+
+                    console.log('Status poll:', result.data); // Debug
+
+                    if (result.success) {
+                        // Usar el total esperado si lo tenemos, sino el de la BD
+                        const total = expectedTotalChunks || result.data.chunks.total || 1;
+                        const completed = result.data.chunks.completed || 0;
+                        const errors = result.data.chunks.error || 0;
+                        const processed = completed + errors;
+                        const progress = Math.round((processed / total) * 100);
+                        
+                        updateProgressUI({
+                            chunks: { 
+                                completed, 
+                                total,
+                                error: errors
+                            },
+                            progress,
+                            estimatedSecondsRemaining: (total - processed) * 2.5 // ~2.5s por chunk
+                        });
+                        
+                        // Si está completo o hay error, detener polling
+                        const status = result.data.recurso.status;
+                        if (status === 'completed' || status === 'error') {
+                            clearInterval(progressPollingInterval);
+                            progressPollingInterval = null;
+                            
+                            document.getElementById('embeddingProgressBar').classList.remove('animated');
+                            document.getElementById('progressCloseBtn').style.display = 'inline-flex';
+                            document.getElementById('progressNote').style.display = 'none';
+                            
+                            if (status === 'completed') {
+                                document.getElementById('progressTitle').textContent = 'Procesamiento completado';
+                                document.getElementById('progressTitle').classList.add('progress-complete');
+                                document.getElementById('embeddingProgressBar').style.width = '100%';
+                                document.getElementById('progressPercent').textContent = '100%';
+                            } else {
+                                document.getElementById('progressTitle').textContent = 'Procesamiento con errores';
+                                document.getElementById('progressTitle').classList.add('progress-error');
+                            }
+                            
+                            loadRecursos();
+                        }
+                    } else {
+                        console.error('Status error:', result);
+                    }
+                } catch (error) {
+                    console.error('Error polling status:', error);
+                }
+            };
+
+            poll();
+            progressPollingInterval = setInterval(poll, 2000);
+        }
+
+        function updateProgressUI(data) {
+            const { chunks, progress, estimatedSecondsRemaining } = data;
+            
+            document.getElementById('progressCompleted').textContent = chunks.completed;
+            document.getElementById('progressTotal').textContent = chunks.total;
+            document.getElementById('progressPercent').textContent = progress + '%';
+            document.getElementById('embeddingProgressBar').style.width = progress + '%';
+            
+            if (estimatedSecondsRemaining > 0) {
+                const minutes = Math.floor(estimatedSecondsRemaining / 60);
+                const seconds = Math.round(estimatedSecondsRemaining % 60);
+                document.getElementById('progressTime').textContent = 
+                    minutes > 0 
+                        ? `Tiempo restante: ~${minutes}m ${seconds}s`
+                        : `Tiempo restante: ~${seconds}s`;
+            } else {
+                document.getElementById('progressTime').textContent = 'Finalizando...';
+            }
+        }
+
+        function closeProgressModal() {
+            document.getElementById('progressModal').classList.remove('active');
+            if (progressPollingInterval) {
+                clearInterval(progressPollingInterval);
+                progressPollingInterval = null;
+            }
+            currentProcessingId = null;
+        }
+
+        // Delete functions
+        function openDeleteModal(id) {
+            deleteId = id;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            deleteId = null;
+        }
+
+        async function confirmDelete() {
+            if (!deleteId) return;
+            
+            const result = await window.API.deleteRecurso(deleteId);
+            
+            if (result.success) {
+                showToast('Recurso eliminado', 'success');
+                closeDeleteModal();
+                loadRecursos();
+            } else {
+                showToast(result.error, 'error');
+            }
+        }
+
+        // PDF upload - CLIENT SIDE EXTRACTION
+        function setupDragDrop() {
+            const dropZone = document.getElementById('fileUpload');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
+                dropZone.addEventListener(event, e => { e.preventDefault(); e.stopPropagation(); });
+            });
+
+            ['dragenter', 'dragover'].forEach(event => {
+                dropZone.addEventListener(event, () => dropZone.classList.add('dragover'));
+            });
+
+            ['dragleave', 'drop'].forEach(event => {
+                dropZone.addEventListener(event, () => dropZone.classList.remove('dragover'));
+            });
+
+            dropZone.addEventListener('drop', e => {
+                const file = e.dataTransfer.files[0];
+                if (file && file.type === 'application/pdf') {
+                    handlePDFFile(file);
+                } else {
+                    showToast('Por favor selecciona un archivo PDF', 'error');
+                }
+            });
+        }
+
+        function handlePDFSelect(event) {
+            const file = event.target.files[0];
+            if (file) handlePDFFile(file);
+        }
+
+        async function handlePDFFile(file) {
+            if (file.size > 50 * 1024 * 1024) {
+                showToast('El archivo es demasiado grande (máx. 50MB)', 'error');
+                return;
+            }
+
+            if (isProcessingPDF) {
+                showToast('Ya se está procesando un PDF', 'error');
+                return;
+            }
+
+            isProcessingPDF = true;
+            
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileInfo').style.display = 'flex';
+            document.getElementById('pdfProgress').style.display = 'block';
+            document.getElementById('pdfProgressText').textContent = 'Cargando PDF...';
+            document.getElementById('pdfProgressBar').style.width = '10%';
+            document.getElementById('fileUpload').classList.add('processing');
+            
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                document.getElementById('pdfProgressBar').style.width = '20%';
+                document.getElementById('pdfProgressText').textContent = 'Analizando documento...';
+                
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                const numPages = pdf.numPages;
+                
+                document.getElementById('pdfProgressText').textContent = `Extrayendo texto (0/${numPages} páginas)...`;
+                
+                let fullText = '';
+                
+                for (let i = 1; i <= numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    fullText += pageText + '\n\n';
+                    
+                    const progress = 20 + Math.round((i / numPages) * 70);
+                    document.getElementById('pdfProgressBar').style.width = progress + '%';
+                    document.getElementById('pdfProgressText').textContent = `Extrayendo texto (${i}/${numPages} páginas)...`;
+                }
+                
+                fullText = fullText.replace(/\s+/g, ' ').replace(/\n\s*\n/g, '\n\n').trim();
+                
+                document.getElementById('pdfProgressBar').style.width = '100%';
+                document.getElementById('pdfProgressText').textContent = 'Completado';
+                
+                uploadedPDFText = fullText;
+                document.getElementById('recursoContenido').value = fullText;
+                
+                if (!document.getElementById('recursoTitulo').value) {
+                    document.getElementById('recursoTitulo').value = file.name.replace('.pdf', '').replace(/_/g, ' ');
+                }
+                
+                showToast(`Texto extraído: ${numPages} páginas, ${fullText.length.toLocaleString()} caracteres`, 'success');
+                
+            } catch (error) {
+                console.error('PDF parse error:', error);
+                showToast('Error al extraer texto del PDF: ' + error.message, 'error');
+                removePDF();
+            } finally {
+                isProcessingPDF = false;
+                document.getElementById('fileUpload').classList.remove('processing');
+            }
+        }
+
+        function removePDF() {
+            document.getElementById('pdfInput').value = '';
+            document.getElementById('fileInfo').style.display = 'none';
+            document.getElementById('pdfProgress').style.display = 'none';
+            document.getElementById('fileUpload').classList.remove('processing');
+            uploadedPDFText = null;
+            isProcessingPDF = false;
+        }
+
+        // Helpers
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            return new Date(dateStr).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function showToast(message, type = 'success') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // ==================== METRICS FUNCTIONS ====================
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.admin-tab').forEach(tab => tab.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabName + 'Tab').classList.add('active');
+
+            // Load data for the tab
+            if (tabName === 'metrics') {
+                loadFeedbackStats();
+            } else if (tabName === 'usuarios') {
+                loadUsers();
+            }
+        }
+
+        async function loadFeedbackStats() {
+            const container = document.getElementById('metricsContainer');
+            container.innerHTML = `
+                <div class="metrics-row-main">
+                    <div class="metrics-loading">
+                        <div class="loading loading-dark"></div>
+                        <span style="margin-left: 0.75rem;">Cargando métricas...</span>
+                    </div>
+                </div>
+            `;
+
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`${_API_URL}/admin/feedback-stats`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    renderMetrics(result.data);
+                } else {
+                    container.innerHTML = `<div class="metrics-row-main"><div class="metrics-loading">Error al cargar métricas</div></div>`;
+                }
+            } catch (error) {
+                console.error('Error loading feedback stats:', error);
+                container.innerHTML = `<div class="metrics-row-main"><div class="metrics-loading">Error de conexión</div></div>`;
+            }
+        }
+
+        function renderMetrics(data) {
+            const container = document.getElementById('metricsContainer');
+            const { summary, resolution, ratings, clarity, escalation } = data;
+
+            // Determine colors based on values
+            const resolutionColor = resolution.rate >= 70 ? 'green' : resolution.rate >= 50 ? 'yellow' : 'red';
+            const escalationColor = escalation.rate <= 20 ? 'green' : escalation.rate <= 40 ? 'yellow' : 'red';
+            const clarityColor = clarity.rate >= 70 ? 'green' : clarity.rate >= 50 ? 'yellow' : 'red';
+
+            container.innerHTML = `
+                <!-- Fila principal: 3 métricas principales -->
+                <div class="metrics-row-main">
+                    <!-- Tasa de Resolución -->
+                    <div class="metric-card">
+                        <div class="metric-card-header">
+                            <span class="metric-label">Tasa de Resolución</span>
+                            <div class="metric-icon ${resolutionColor}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                    <polyline points="22 4 12 14.01 9 11.01"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="metric-value-row">
+                            <span class="metric-value">${resolution.rate}</span>
+                            <span class="metric-unit">%</span>
+                        </div>
+                        <div class="metric-detail">${resolution.resolved} resueltas de ${summary.totalFeedback} consultas</div>
+                        <div class="metric-progress">
+                            <div class="metric-progress-bar">
+                                <div class="metric-progress-fill ${resolutionColor}" style="width: ${resolution.rate}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calidad de Respuesta -->
+                    <div class="metric-card">
+                        <div class="metric-card-header">
+                            <span class="metric-label">Calidad de Respuesta</span>
+                            <div class="metric-icon yellow">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="metric-value-row">
+                            <span class="metric-value">${ratings.quality ? ratings.quality.toFixed(1) : '-'}</span>
+                            <span class="metric-unit">/ 5</span>
+                        </div>
+                        <div class="metric-stars">
+                            ${renderStars(ratings.quality || 0)}
+                        </div>
+                        <div class="metric-detail" style="margin-top: 0.75rem;">Promedio de valoraciones</div>
+                    </div>
+
+                    <!-- Velocidad de Respuesta -->
+                    <div class="metric-card">
+                        <div class="metric-card-header">
+                            <span class="metric-label">Velocidad de Respuesta</span>
+                            <div class="metric-icon blue">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="metric-value-row">
+                            <span class="metric-value">${ratings.speed ? ratings.speed.toFixed(1) : '-'}</span>
+                            <span class="metric-unit">/ 5</span>
+                        </div>
+                        <div class="metric-stars">
+                            ${renderStars(ratings.speed || 0)}
+                        </div>
+                        <div class="metric-detail" style="margin-top: 0.75rem;">Promedio de valoraciones</div>
+                    </div>
+                </div>
+
+                <!-- Fila secundaria: 3 métricas secundarias -->
+                <div class="metrics-row-secondary">
+                    <!-- Claridad de Pasos -->
+                    <div class="metric-card">
+                        <div class="metric-card-header">
+                            <span class="metric-label">Claridad de Pasos</span>
+                            <div class="metric-icon purple">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 11l3 3L22 4"/>
+                                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="metric-value-row">
+                            <span class="metric-value">${clarity.rate}</span>
+                            <span class="metric-unit">%</span>
+                        </div>
+                        <div class="metric-detail">${clarity.clear} usuarios con pasos claros</div>
+                        <div class="metric-progress">
+                            <div class="metric-progress-bar">
+                                <div class="metric-progress-fill ${clarityColor}" style="width: ${clarity.rate}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tasa de Escalación -->
+                    <div class="metric-card">
+                        <div class="metric-card-header">
+                            <span class="metric-label">Tasa de Escalación</span>
+                            <div class="metric-icon red">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M17 1l4 4-4 4"/>
+                                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                                    <path d="M7 23l-4-4 4-4"/>
+                                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="metric-value-row">
+                            <span class="metric-value">${escalation.rate}</span>
+                            <span class="metric-unit">%</span>
+                        </div>
+                        <div class="metric-detail">${escalation.total} escaladas a humanos</div>
+                        <div class="metric-progress">
+                            <div class="metric-progress-bar">
+                                <div class="metric-progress-fill ${escalationColor}" style="width: ${escalation.rate}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Escalaciones por Categoría -->
+                    <div class="metric-card">
+                        <div class="metric-card-header">
+                            <span class="metric-label">Desglose por Categoría</span>
+                            <div class="metric-icon cyan">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="metric-breakdown">
+                            <div class="metric-breakdown-item">
+                                <span class="metric-breakdown-label">
+                                    <span class="metric-breakdown-dot comercial"></span>
+                                    Comercial
+                                </span>
+                                <span class="metric-breakdown-value">${escalation.byCategory.comercial || 0}</span>
+                            </div>
+                            <div class="metric-breakdown-item">
+                                <span class="metric-breakdown-label">
+                                    <span class="metric-breakdown-dot meta-ads"></span>
+                                    Meta Ads
+                                </span>
+                                <span class="metric-breakdown-value">${escalation.byCategory['meta-ads'] || 0}</span>
+                            </div>
+                            <div class="metric-breakdown-item">
+                                <span class="metric-breakdown-label">
+                                    <span class="metric-breakdown-dot gohighlevel"></span>
+                                    GoHighLevel
+                                </span>
+                                <span class="metric-breakdown-value">${escalation.byCategory.gohighlevel || 0}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStars(rating) {
+            let html = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= Math.floor(rating)) {
+                    html += `<svg class="metric-star filled" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+                } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
+                    html += `<svg class="metric-star filled" viewBox="0 0 24 24" fill="currentColor" style="opacity: 0.5;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+                } else {
+                    html += `<svg class="metric-star empty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+                }
+            }
+            return html;
+        }
+
+        // ==================== USER MANAGEMENT FUNCTIONS ====================
+
+        let allUsers = [];
+        let selectedUserId = null;
+        let showBlockedOnly = false;
+        let showAdminsOnly = false;
+        let pendingBlockUserId = null;
+        let pendingBlockStatus = null;
+
+        async function loadUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="users-loading">
+                        <div class="loading loading-dark"></div>
+                        <p style="margin-top: 0.75rem;">Cargando usuarios...</p>
+                    </td>
+                </tr>
+            `;
+
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`${_API_URL}/admin/users?limit=100`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    allUsers = result.data.users;
+                    document.getElementById('usersCountBadge').textContent = `${allUsers.length} usuarios`;
+                    renderUsers(allUsers);
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="7" class="users-empty">Error al cargar usuarios</td></tr>`;
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                tbody.innerHTML = `<tr><td colspan="7" class="users-empty">Error de conexión</td></tr>`;
+            }
+        }
+
+        function renderUsers(users) {
+            const tbody = document.getElementById('usersTableBody');
+
+            if (users.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="users-empty">No hay usuarios</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-avatar">${getInitials(user.name)}</div>
+                            <span class="user-name">${escapeHtml(user.name)}</span>
+                        </div>
+                    </td>
+                    <td>${escapeHtml(user.email)}</td>
+                    <td>${user.company ? escapeHtml(user.company) : '<span style="color: var(--text-secondary);">-</span>'}</td>
+                    <td><span class="user-badge ${user.role}">${user.role === 'admin' ? 'Admin' : 'Usuario'}</span></td>
+                    <td><span class="user-badge ${user.isActive ? 'active' : 'blocked'}">${user.isActive ? 'Activo' : 'Bloqueado'}</span></td>
+                    <td>${formatDate(user.createdAt)}</td>
+                    <td>
+                        <div class="user-actions-cell">
+                            <button class="user-action-btn" onclick="confirmToggleAdmin('${user.id}', '${user.role}')" title="${user.role === 'admin' ? 'Quitar admin' : 'Hacer admin'}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
+                                </svg>
+                            </button>
+                            <button class="user-action-btn" onclick="confirmBlockUser('${user.id}', ${user.isActive})" title="${user.isActive ? 'Bloquear' : 'Desbloquear'}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    ${user.isActive
+                                        ? '<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>'
+                                        : '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'
+                                    }
+                                </svg>
+                            </button>
+                            <button class="user-action-btn danger" onclick="confirmDeleteUserDirect('${user.id}', '${escapeHtml(user.name)}')" title="Eliminar">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterUsers() {
+            const search = document.getElementById('usersSearchInput').value.toLowerCase();
+            let filtered = allUsers.filter(user =>
+                user.name.toLowerCase().includes(search) ||
+                user.email.toLowerCase().includes(search) ||
+                (user.company && user.company.toLowerCase().includes(search))
+            );
+            if (showBlockedOnly) {
+                filtered = filtered.filter(user => !user.isActive);
+            }
+            if (showAdminsOnly) {
+                filtered = filtered.filter(user => user.role === 'admin');
+            }
+            renderUsers(filtered);
+        }
+
+        function toggleBlockedFilter() {
+            showBlockedOnly = !showBlockedOnly;
+            if (showBlockedOnly) showAdminsOnly = false;
+            document.getElementById('blockedFilterBtn').classList.toggle('active', showBlockedOnly);
+            document.getElementById('adminFilterBtn').classList.toggle('active', showAdminsOnly);
+            filterUsers();
+        }
+
+        function toggleAdminFilter() {
+            showAdminsOnly = !showAdminsOnly;
+            if (showAdminsOnly) showBlockedOnly = false;
+            document.getElementById('adminFilterBtn').classList.toggle('active', showAdminsOnly);
+            document.getElementById('blockedFilterBtn').classList.toggle('active', showBlockedOnly);
+            filterUsers();
+        }
+
+        function confirmBlockUser(userId, currentStatus) {
+            pendingBlockUserId = userId;
+            pendingBlockStatus = currentStatus;
+            const user = allUsers.find(u => u.id === userId);
+            const userName = user ? user.name : 'este usuario';
+
+            const modal = document.getElementById('blockUserModal');
+            const title = document.getElementById('blockModalTitle');
+            const message = document.getElementById('blockModalMessage');
+            const btn = document.getElementById('blockModalBtn');
+
+            if (currentStatus) {
+                // User is active, we're going to block them
+                title.textContent = 'Bloquear Usuario';
+                message.textContent = `¿Estás seguro de que quieres bloquear a ${userName}? Se bloqueará su email e IP para evitar que cree nuevas cuentas.`;
+                btn.textContent = 'Bloquear Usuario';
+                btn.className = 'btn btn-danger';
+            } else {
+                // User is blocked, we're going to unblock them
+                title.textContent = 'Desbloquear Usuario';
+                message.textContent = `¿Quieres desbloquear a ${userName}? Podrá acceder de nuevo a su cuenta.`;
+                btn.textContent = 'Desbloquear Usuario';
+                btn.className = 'btn btn-primary';
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeBlockUserModal() {
+            document.getElementById('blockUserModal').classList.remove('active');
+            pendingBlockUserId = null;
+            pendingBlockStatus = null;
+        }
+
+        async function executeBlockUser() {
+            if (!pendingBlockUserId) return;
+
+            const newStatus = !pendingBlockStatus;
+
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`${_API_URL}/admin/users/${pendingBlockUserId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ isActive: newStatus })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(newStatus ? 'Usuario desbloqueado' : 'Usuario bloqueado', 'success');
+
+                    // Update local data
+                    const userIndex = allUsers.findIndex(u => u.id === pendingBlockUserId);
+                    if (userIndex !== -1) {
+                        allUsers[userIndex].isActive = newStatus;
+                    }
+                    closeBlockUserModal();
+                    filterUsers();
+                } else {
+                    showToast('Error al actualizar usuario', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating user:', error);
+                showToast('Error de conexión', 'error');
+            }
+        }
+
+        async function confirmToggleAdmin(userId, currentRole) {
+            const user = allUsers.find(u => u.id === userId);
+            const userName = user ? user.name : 'este usuario';
+            const newRole = currentRole === 'admin' ? 'user' : 'admin';
+            const action = newRole === 'admin' ? 'hacer administrador a' : 'quitar permisos de administrador a';
+
+            if (!confirm(`¿Estás seguro de que quieres ${action} ${userName}?`)) {
+                return;
+            }
+
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`${_API_URL}/admin/users/${userId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ role: newRole })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(newRole === 'admin' ? 'Usuario promovido a administrador' : 'Permisos de administrador removidos', 'success');
+
+                    // Update local data
+                    const userIndex = allUsers.findIndex(u => u.id === userId);
+                    if (userIndex !== -1) {
+                        allUsers[userIndex].role = newRole;
+                    }
+                    filterUsers();
+                } else {
+                    showToast(result.message || 'Error al actualizar rol', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating user role:', error);
+                showToast('Error de conexión', 'error');
+            }
+        }
+
+        function getInitials(name) {
+            if (!name) return '?';
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function toggleUserBlockDirect(userId, currentStatus) {
+            const newStatus = !currentStatus;
+
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`${_API_URL}/admin/users/${userId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ isActive: newStatus })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(newStatus ? 'Usuario desbloqueado' : 'Usuario bloqueado', 'success');
+
+                    // Update local data
+                    const userIndex = allUsers.findIndex(u => u.id === userId);
+                    if (userIndex !== -1) {
+                        allUsers[userIndex].isActive = newStatus;
+                    }
+                    filterUsers();
+                } else {
+                    showToast('Error al actualizar usuario', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating user:', error);
+                showToast('Error de conexión', 'error');
+            }
+        }
+
+        function confirmDeleteUserDirect(userId, userName) {
+            selectedUserId = userId;
+            document.getElementById('deleteUserModal').classList.add('active');
+        }
+
+        function closeDeleteUserModal() {
+            document.getElementById('deleteUserModal').classList.remove('active');
+            selectedUserId = null;
+        }
+
+        async function executeDeleteUser() {
+            if (!selectedUserId) return;
+
+            try {
+                const token = localStorage.getItem('authToken');
+                const response = await fetch(`${_API_URL}/admin/users/${selectedUserId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Usuario eliminado', 'success');
+                    closeDeleteUserModal();
+
+                    // Remove from local data
+                    allUsers = allUsers.filter(u => u.id !== selectedUserId);
+                    document.getElementById('usersCountBadge').textContent = `${allUsers.length} usuarios`;
+                    selectedUserId = null;
+                    filterUsers();
+                } else {
+                    showToast(result.message || 'Error al eliminar usuario', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                showToast('Error de conexión', 'error');
+            }
+        }
+    </script>
+</body>
+</html>
