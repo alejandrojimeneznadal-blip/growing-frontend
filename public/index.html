@@ -271,9 +271,9 @@
         }
         .header-user { display: flex; align-items: center; gap: 0.75rem; }
         .header-avatar {
-            width: 48px; height: 48px;
+            width: 36px; height: 36px;
             background: var(--bg-secondary);
-            border-radius: 50%; 
+            border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             overflow: hidden;
             border: 2px solid var(--border-color);
@@ -339,7 +339,7 @@
         .welcome-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem; color: var(--text-primary); }
         .welcome-subtitle { color: var(--text-secondary); text-align: center; margin-bottom: 3rem; max-width: 500px; }
 
-        .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 900px; width: 100%; }
+        .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; max-width: 1000px; width: 100%; }
         .category-card {
             background-color: var(--bg-primary); border: 2px solid var(--border-color);
             border-radius: 16px; padding: 2rem; cursor: pointer;
@@ -1009,6 +1009,11 @@
                     <h2 class="welcome-title" id="welcomeTitle">¡Bienvenido al Centro de Soporte!</h2>
                     <p class="welcome-subtitle" id="welcomeSubtitle">Estoy aquí para ayudarte a hacer crecer tu inmobiliaria. Selecciona un tema para comenzar o escribe tu pregunta directamente.</p>
                     <div class="category-grid">
+                        <div class="category-card" onclick="selectCategory('direccion')">
+                            <div class="category-icon"><svg class="icon" viewBox="0 0 24 24" stroke="white" fill="none"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></div>
+                            <h3 class="category-title">Dirección</h3>
+                            <p class="category-description">Liderazgo y gestión</p>
+                        </div>
                         <div class="category-card" onclick="selectCategory('comercial')">
                             <div class="category-icon"><svg class="icon" viewBox="0 0 24 24" stroke="white" fill="none"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
                             <h3 class="category-title">Comercial</h3>
@@ -1023,11 +1028,6 @@
                             <div class="category-icon"><svg class="icon" viewBox="0 0 24 24" stroke="white" fill="none"><path d="M2 17l10 5 10-5M2 12l10 5 10-5M12 2L2 7l10 5 10-5-10-5z"/></svg></div>
                             <h3 class="category-title">GoHighLevel</h3>
                             <p class="category-description">CRM y automatización</p>
-                        </div>
-                        <div class="category-card" onclick="selectCategory('direccion')">
-                            <div class="category-icon"><svg class="icon" viewBox="0 0 24 24" stroke="white" fill="none"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></div>
-                            <h3 class="category-title">Dirección</h3>
-                            <p class="category-description">Liderazgo y gestión</p>
                         </div>
                     </div>
                 </div>
