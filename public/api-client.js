@@ -1,7 +1,7 @@
 // ==========================================
 // API Configuration
 // ==========================================
-const API_BASE_URL = 'https://growing-staging-backend.xsxjch.easypanel.host/api';
+const API_BASE_URL = 'https://growing-backend.xsxjch.easypanel.host/api';
 
 let authToken = localStorage.getItem('authToken') || null;
 
