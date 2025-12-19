@@ -6,6 +6,23 @@ const API_BASE_URL = 'https://growing-staging-backend.xsxjch.easypanel.host/api'
 let authToken = localStorage.getItem('authToken') || null;
 
 // ==========================================
+// Helper: Handle 401 errors (token expired/invalid)
+// ==========================================
+function handle401Error() {
+    console.warn('401 Unauthorized - Token invalid or expired. Forcing re-login.');
+    authToken = null;
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('currentConversation');
+
+    // Redirect to login if not already there
+    if (!window.location.pathname.includes('login') && !window.location.pathname.includes('register')) {
+        alert('Tu sesión ha expirado. Por favor, inicia sesión de nuevo.');
+        window.location.href = '/';
+    }
+}
+
+// ==========================================
 // Auth Functions
 // ==========================================
 async function loginUser(email, password) {
@@ -74,6 +91,16 @@ function logoutUser() {
 // ==========================================
 async function sendMessage(message, conversationId = null, imageBase64 = null, imageMimeType = null, category = null) {
     try {
+        // Debug: Log auth status
+        console.log('sendMessage - authToken exists:', !!authToken);
+        console.log('sendMessage - authToken value:', authToken ? authToken.substring(0, 20) + '...' : 'null');
+
+        if (!authToken) {
+            console.error('No auth token available');
+            handle401Error();
+            return { success: false, error: 'No hay sesión activa. Por favor, inicia sesión.' };
+        }
+
         const body = { message };
         if (conversationId) {
             body.conversationId = conversationId;
@@ -97,12 +124,18 @@ async function sendMessage(message, conversationId = null, imageBase64 = null, i
             body: JSON.stringify(body)
         });
 
+        // Handle 401 specifically
+        if (response.status === 401) {
+            handle401Error();
+            return { success: false, error: 'Sesión expirada. Por favor, inicia sesión de nuevo.' };
+        }
+
         const data = await response.json();
         console.log('Send message response:', data);
-        
+
         if (response.ok && data.success) {
-            return { 
-                success: true, 
+            return {
+                success: true,
                 conversation: data.data.conversation,
                 userMessage: data.data.userMessage,
                 botMessage: data.data.botMessage
@@ -118,20 +151,30 @@ async function sendMessage(message, conversationId = null, imageBase64 = null, i
 
 async function loadConversations(limit = 20, offset = 0) {
     try {
+        if (!authToken) {
+            handle401Error();
+            return { success: false, error: 'No hay sesión activa' };
+        }
+
         const response = await fetch(
-            `${API_BASE_URL}/chat/conversations?limit=${limit}&offset=${offset}`, 
+            `${API_BASE_URL}/chat/conversations?limit=${limit}&offset=${offset}`,
             {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${authToken}` }
             }
         );
 
+        if (response.status === 401) {
+            handle401Error();
+            return { success: false, error: 'Sesión expirada' };
+        }
+
         const data = await response.json();
         console.log('Load conversations response:', data);
-        
+
         if (response.ok && data.success) {
-            return { 
-                success: true, 
+            return {
+                success: true,
                 conversations: data.data.conversations,
                 pagination: data.data.pagination
             };
